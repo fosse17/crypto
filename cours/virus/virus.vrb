@@ -1,0 +1,18 @@
+\frametitle{Le problème de détection (3)}
+\begin{itemize}
+\item Le problème de détection général est \textbf{indécidable}, que faire ?
+\item Heuristique
+\item Une détection exacte n'est pas obligatoire
+\begin{itemize}
+\item Détection de séquences d'instructions \textbf{suspectes} (signature)
+\end{itemize}
+\item Analyse statistique des instructions
+\end{itemize}
+\begin{exampleblock}{Scan antivir}
+\tiny{
+\begin{verbatim}
+C:\taf\cours\09-10\lp\secu\cours\virus\demo1\testnotepad.exe
+    [RESULTAT]  Contient le code suspect : GEN/Malware
+    [REMARQUE]  Le résultat positif a été classé comme suspect.
+\end{verbatim}}
+\end{exampleblock}

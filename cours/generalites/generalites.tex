@@ -1,0 +1,554 @@
+\documentclass{beamer}
+\usepackage[french]{babel}
+\mode<presentation>
+\usepackage[latin1]{inputenc}
+
+\usetheme{Luebeck}
+%\usecolortheme{seahorse}
+\setbeamertemplate{bibliography item}[text]
+\setbeamertemplate{blocks}[rounded][shadow=true]
+
+
+\title[Introduction à la sécurité informatique]{Sécurité informatique: introduction}
+\institute{\textbf{Pierre Ramet:} \texttt{ramet@labri.fr}}
+
+
+\author{DUT S4}
+\date{2013-2014}
+
+%\setcounter{tocdepth}{1}
+\begin{document}
+
+\begin{frame}
+
+  \titlepage
+
+\end{frame}
+
+\AtBeginSubsection[]
+                  {
+                    \begin{frame}<beamer>
+                      \frametitle{Plan}
+                      \tableofcontents[currentsection,currentsubsection,sectionstyle=show/shaded,subsectionstyle=show/shaded/hide]
+                    \end{frame}
+                  }
+
+
+
+\section{Généralités}
+\subsection{Définition et enjeux}
+
+
+\begin{frame}{Définition de la sécurité informatique}
+\begin{definition}
+Information security is the protection of information [Assets]
+from a wide range of threats in order to ensure business
+continuity, minimize business risks and maximize return on
+investment and business opportunities.
+\end{definition}
+\end{frame}
+
+\begin{frame}{Sécurité informatique}
+\begin{itemize}
+\item Les systèmes informatiques sont au coeur
+des systèmes d'information
+\item Ils sont devenus la cible de ceux qui
+convoitent l'information
+\item Assurer la sécurité de l'information implique
+d'assurer la sécurité des systèmes
+informatiques
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{La sécurité des systèmes d'informations}
+\begin{figure}
+\includegraphics[scale=0.35]{image2.png}
+\end{figure}
+\end{frame}
+
+
+
+\begin{frame}{Qui sont les pirates ?}
+\begin{itemize}
+\item Peut être n'importe qui avec l'évolution et la vulgarisation des connaissances
+\item Beaucoup d'outils sont disponibles sur Internet
+\item Trois générations :
+\begin{itemize}
+\item 80's-90's: techniciens éclairés
+\item 1990-2000: script kiddies
+\item 2000-aujourd'hui: l'insécurité devient facilement rentable 
+\begin{itemize}
+\item Pub, SPAM
+\item e-commerce
+\item Espionnage industriel
+\end{itemize}
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Quels sont leurs objectifs}
+Objectifs des attaques:
+\begin{itemize}
+\item Prouver ses compétences techniques
+\item Représailles
+\item Désinformer
+\item Empêcher l'accès à une ressource (Bombes logiques, DOS)
+\item Prendre le contrôle d'une ressource (BotNets)
+\item Récupérer de l'information sur un système (Espionnage industriel)
+\item Générer des revenus: (Vol, Extorsion, Publicité)
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Les risques pour l'entreprise}
+Les risques encourus par l'entreprise:
+\begin{itemize}
+\item Les risque stratégiques
+\begin{itemize}
+\item Destruction/altération de données
+\begin{itemize}
+\item Exemple: \texttt{Boeing} (57000\$ après une intrusion)
+\end{itemize}
+\item Vol de données stratégiques
+\begin{itemize}
+\item Exemple: \texttt{Gartner William Malik} (900 M\$)
+\end{itemize}
+\end{itemize}
+\item Les autres risques
+\begin{itemize}
+\item Le commerce electronique
+\begin{itemize}
+\item Exemple: \texttt{Kevin Mitnick} et \texttt{Netcom} 
+\end{itemize}
+\item Piratage de site web
+\begin{itemize}
+\item Image de marque, militantisme
+\end{itemize}
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{La sécurité, un marché porteur}
+\begin{figure}
+\includegraphics[scale=0.3]{marche.png}
+\end{figure}
+\end{frame}
+
+
+
+\subsection{Les objectifs de la sécurité informatique}
+\begin{frame}{Objectifs}
+Les trois princpaux objectifs de la sécurité infromatique:
+\begin{columns}
+\begin{column}[l]{5cm}
+\begin{itemize}
+\item \textbf{Confidentialité}
+\item \textbf{Intégrité} 
+\item \textbf{Disponibilité} 
+\end{itemize}
+\end{column}
+\begin{column}[l]{5cm}
+\begin{figure}
+\includegraphics[scale=0.2]{cid.png}
+\end{figure}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Confidentialité}
+\begin{definition}
+Propriété d'une donnée dont la diffusion doit être limitée aux
+seules personnes autorisées
+\end{definition}
+~\\
+
+\begin{columns}
+\begin{column}[l]{4cm}
+Menaces:
+\begin{itemize}
+\item Ecoute du réseau
+\begin{itemize}
+\item Interne
+\item Externe
+\end{itemize}
+\item Vol de fichiers 
+\begin{itemize}
+\item Données
+\item Mots de passe
+\end{itemize}
+\item Espionnage 
+\item Ingénierie sociale
+\end{itemize}
+\end{column}
+\begin{column}[r]{6cm}
+Contre-mesures:
+\begin{itemize}
+\item Cryptographie (chiffrement)
+\begin{itemize}
+\item Des données
+\item Des communications
+\end{itemize}
+\item Contrôle d'accès
+\begin{itemize}
+\item Logique (mot de passe)
+\item Physique (biométrie)
+\end{itemize}
+\item Classification des actifs
+\item Formation du personnel
+\end{itemize}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Intégrité}
+\begin{definition}
+Propriété d'une donnée dont la valeur est conforme à celle définie
+par son propriétaire
+\end{definition}
+~\\
+
+\begin{columns}
+\begin{column}[l]{5cm}
+Menaces:
+\begin{itemize}
+\item Attaques malicieuses
+\begin{itemize}
+\item Vers, virus
+\item Bombes logiques
+\end{itemize}
+\item Désinformation
+\item Erreurs humaines
+\end{itemize}
+\end{column}
+\begin{column}[r]{5cm}
+Contre-mesures:
+\begin{itemize}
+\item Cryptographie
+\begin{itemize}
+\item Signature, authentification
+\end{itemize}
+\item Systèmes de détection
+\begin{itemize}
+\item Antivirus, systèmes de détection d'intrusion (IDS)
+\end{itemize}
+\item Politique de sauvegarde
+\end{itemize}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Disponibilité}
+\begin{definition}
+Propriété d'un S.I capable d'assurer ses
+fonctions sans interruption, délai ou dégradation, au moment
+même où la sollicitation en est faite
+\end{definition}
+~\\
+
+\begin{columns}
+\begin{column}[l]{5cm}
+Menaces:
+\begin{itemize}
+\item Attaques malicieuses
+\begin{itemize}
+\item Denis de services
+\item SPAM
+\end{itemize}
+\item Attaques accidentelles
+\begin{itemize}
+\item Le \textit{"Slashdot effect"}
+\end{itemize}
+\item Pannes
+\end{itemize}
+\end{column}
+\begin{column}[r]{5cm}
+Contre-mesures:
+\begin{itemize}
+\item Pare-feu
+\item Systèmes de détection d'intrusions
+\item Clustering
+\item Formation des administrateurs
+\end{itemize}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Les actifs de l'entreprise}
+Que protéger ?
+~\\
+
+\begin{definition}
+Les actifs informationnels représentent l'ensemble des données et
+des systèmes de l'information nécessaires au bon déroulement
+d'une entreprise
+\end{definition}
+~\\
+
+\begin{columns}
+\begin{column}[l]{5cm}
+\begin{itemize}
+\item Base de données clients
+\begin{itemize}
+\item Vente et Marketing
+\end{itemize}
+\item Base de données des employés
+\begin{itemize}
+\item Ressources humaines
+\end{itemize}
+\item Portail web
+\begin{itemize}
+\item Vente
+\end{itemize}
+\end{itemize}
+\end{column}
+\begin{column}[l]{5cm}
+\begin{itemize}
+\item Codes sources
+\begin{itemize}
+\item Equipe de developpement
+\end{itemize}
+\item Base de données usagers
+\begin{itemize}
+\item Equipe système
+\end{itemize}
+\end{itemize}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}
+Objectifs (reformulés):
+\begin{itemize}
+\item La sécurité de l'information consiste à protéger les \textit{actifs}
+informationnels afin d'assurer l'intégralité de leurs \textit{propriétés}
+\item Les actifs et leurs propriétés sont définis par les \textit{objectifs d'affaire}
+\end{itemize}
+\end{frame}
+
+
+%===============================================================================
+
+\subsection{Etat de l'art}
+\begin{frame}{Un constat amer}
+Evolution des risques:
+\begin{itemize}
+\item En 2005, sur 218 entreprises européennes, plus de 50\% ont subit des pertes financières liées à des attaques informatiques
+\begin{itemize}
+\item Croissance de l'Internet
+\item Ouverture des réseaux de communication
+\item Succès des technologies nomades (téléphones, pda)
+\item Augmentation du nombre d'attaques
+\item Technologies plus complexes et moins maitrisées
+\item Changement de profil des pirates
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Type des attaques}
+Types d'attaques répertoriées en 2006:
+\begin{figure}
+\includegraphics[scale=0.3]{types.png}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Délais des attaques}
+Evolution des délais entre découverte d'une vulnérabilité et exploitation:
+\begin{figure}
+\includegraphics[scale=0.3]{vulns.png}
+\end{figure}
+\end{frame}
+
+                  
+\begin{frame}{Les coûts de l'insécurité}
+\begin{figure}
+\includegraphics[scale=0.3]{image1.png}
+\end{figure}
+\end{frame}
+
+
+\section{La sécurité en entreprise}
+
+\subsection{Politique de sécurité}
+
+\begin{frame}{Définition}
+\begin{definition}
+Les politiques de sécurité sont des énoncés généraux dictées
+par les cadres supérieurs décrivant le rôle de la sécurité au sein
+de l'entreprise afin d'assurer les objectifs d'affaire.
+\end{definition}
+~\\
+
+\begin{itemize}
+\item Pour mettre en oeuvre ces politiques, une organisation doit être
+mise en place.
+\item Définition des rôles, des responsabilités et des imputabilités
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Politique de sécurité}
+Compromis sécurité - fonctionnalité :
+\begin{itemize}
+\item Définir les besoins.
+\begin{itemize}
+\item Déterminer les actifs à protéger et leurs propriétaires
+\begin{itemize}
+\item Quelles sont leurs valeurs? Quelles sont leurs criticités? Quelles sont leurs propriétés ?
+\end{itemize}
+\item Déterminer les menaces représentant des risques
+\begin{itemize}
+\item Quels sont les acteurs ? attaqueurs? Quels sont leurs moyens ?
+\end{itemize}
+\item Déterminer les objectifs à atteindre
+\begin{itemize}
+\item Quelles sont les propriétés des actifs à protéger ?
+\end{itemize}
+\end{itemize} 
+\item Proposer une solution.
+\begin{itemize}
+\item Déterminer les contre-mesures à mettre en place
+\end{itemize}
+\item Évaluer les risques résiduels.
+\begin{itemize}
+\item Déterminer quelles sont les vulnérabilités toujours présentes
+\item Déterminer leurs impacts sur les objectifs initiaux
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Politique de sécurité (2)}
+Création d'une politique de sécurité:
+\begin{itemize}
+\item Mise en oeuvre
+\item Audit
+\item Tests d'intrusion
+\item Détection d'incidents
+\item Réactions
+\item Restauration
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Politique de sécurité (3)}
+Quelques méthodes:
+\begin{itemize}
+\item EBIOS (Expressions des Besoins et Identification des
+Objectifs de Sécurité)
+http://www.ssi.gouv.fr/fr/confiance/ebios.html
+\item MEHARI (MEthode Harmonisée d'Analyse de
+Risques)
+http://www.clusif.asso.fr/fr/production/mehari
+\item Critères Communs (http://www.commoncriteriaportal.org) 
+\item La norme ISO 17799
+Présentation:
+http://www.clusif.asso.fr/fr/production/ouvrages/pdf/Presentation-ISO17799-2005.pdf
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Exemple ISO 17799}
+\begin{figure}
+\includegraphics[scale=0.4]{iso.png}
+\end{figure}
+\end{frame}
+
+\subsection{Le rôle de l'informaticien}
+\begin{frame}{Logiciel de sécurité par excellence ?}
+\begin{itemize}
+\item Pare-feu ?
+\item Antivirus ?
+\item Système de détection d'intrusions ?
+\item $\dots$ ?
+\item \textbf{PowerPoint} !!!
+\end{itemize}
+\end{frame}
+ 
+
+\begin{frame}{Le problème}
+L'industrie de la sécurité
+\begin{itemize}
+\item  En 2003, le marché de la sécurité réseau était évalué à 45 milliards USD
+\item Constat
+\begin{itemize}
+\item L'approche traditionnelle de sécuriser le périmètre du réseau ne semble
+pas adéquate puisque nous avons toujours les mêmes problèmes
+\end{itemize}
+\item Raisons:
+\begin{itemize}
+\item Le manque d'information des utilisateurs
+\item La \textbf{qualité des logiciels}
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Le rôle du développeur}
+\begin{itemize}
+\item La sécurité des logiciels est donc critique!
+\begin{itemize}
+\item 50 \% des vulnérabilités proviennent des erreurs de conception
+\item 50 \% des vulnérabilités proviennent des erreurs d'implémentation
+\begin{itemize}
+\item Dépassement de mémoire et d'entier
+\item Concurrence critique
+\end{itemize}
+\end{itemize}
+\item Microsoft's Trustworthy Computing Initiative
+\begin{itemize}
+\item Mémo de Bill Gates en janvier 2002 présente la nouvelle approche de
+Microsoft de développer des logiciels sécurisés
+\item Microsoft aurait dépensé plus de 300 millions USD
+\end{itemize}
+\item Workshop on Rapide Malware 2006
+\begin{itemize}
+\item Un panel reconnaissait l'impact de cette initiative sur la prévalence des
+vers et des virus
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Solution}
+Plusieurs solutions:
+\begin{itemize}
+\item Développement fiable (cycle en $V$, en $W$, etc.)
+\item Politique qualité au sein de l'entreprise (ISO, CMMI)
+\item \textbf{Informer} !
+\end{itemize}
+\end{frame}
+
+\subsection{Conclusion}
+\begin{frame}{Conclusion}
+\begin{itemize}
+\item La sécurité informatique ne doit plus être ignorée !
+\item Connaissez-vous vous-même
+\begin{itemize}
+\item Déterminer les actifs qui doivent être protégés et leurs propriétés
+\item Déterminer les objectifs à atteindre
+\end{itemize}
+\item Connaissez vos ennemis 
+\begin{itemize}
+\item Déterminer les menaces contre lesquelles ils doivent être protégés
+\end{itemize}
+\item Réagissez !
+\begin{itemize}
+\item Politique de sécurité
+\item Principes, guides et règles connues
+\item Informer
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\section{Références}
+\subsection{Quelque liens}
+\begin{frame}{Liens utiles}
+\begin{itemize}
+\item http://www.miscmag.com (FR)
+\item http://sid.rstack.org/blog (FR)
+\item http://www.securityfocus.com
+\item http://www.sans.org
+\item http://www.hoobie.net
+\item http://packetstorm.security.org
+\item http://www.rootshell.com
+\item et beaucoup d'autres ...
+\end{itemize}
+\end{frame}
+
+\end{document}

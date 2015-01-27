@@ -1,0 +1,118 @@
+\documentclass[a4paper]{article}
+
+
+\usepackage[latin1]{inputenc} % LaTeX, comprends les accents !
+\usepackage[T1]{fontenc} % Police contenant les caractères français
+\usepackage{geometry} % Définir les marges
+\usepackage[french,english]{babel}
+\usepackage{graphicx}
+\usepackage{url}
+
+%\pagestyle{fancyheaders}
+\title{\textbf{Cryptographie symétrique: César, Vigénere, réseaux de Feistel}}
+\author{Cours de sécurité: DUT S4}
+\date{2013-2014}
+\begin{document}
+\maketitle
+
+\section{Chiffrement de César}
+%Téléchargez l'archive du TP à l'adresse \url{www.labri.fr/~tabary/cours/0910/secu_2a/tp1.zip}
+\subsection{Cryptographie}
+\begin{enumerate}
+\item Observez puis compilez le programme \texttt{cesar.cpp}, qui implémente l'algorithme de chiffrement/déchiffrement de César vu en cours
+\begin{itemize}
+\item Entrée: un fichier et le décalage (une lettre minuscule: $'a'=0$ ... $'z'=25$)
+\item Sortie: le fichier chiffré
+\item Notes:
+\begin{itemize}
+\item On ne prendra en compte (jusqu'à la fin de ce tp) que les fichiers contenant uniquement des lettres minuscules (pas d'accents, pas d'espace, pas de ponctuation). Pourquoi ?
+\item On pose $'a'=0$ ... $'z'=25$
+\end{itemize}
+\end{itemize}
+\item Testez-le sur des fichiers de votre crû, chiffrez puis déchiffrez.
+\item Si un programme a été chiffré avec la clé 'e', quelle est la clé de déchiffrement ?
+\item Que remarquez vous pour un chiffrement/déchiffrement avec pour clé 'n' (i.e un décalage de 13) ?
+\end{enumerate}
+
+\subsection{Cryptanalyse}
+On se propose maintenant de casser le chiffrement de césar via une attaque de type texte chiffré connu.
+\begin{enumerate}
+\item Comment faire ?
+\item Créez un programme \texttt{freq.cpp} qui calcule la fréquence d'apparition des lettres d'un fichier texte (vous pourrez vous aider du squelette \texttt{lecture\_fichier.cpp})
+\item Retrouvez le texte clair à partir du fichier chiffré \texttt{cesar1\_chiffre.txt} 
+\begin{itemize}
+\item La fréquence des lettres de l'alphabet est donné en annexe
+\end{itemize}
+\end{enumerate}
+
+\section{Vigenere}
+\subsection{Cryptographie}
+\begin{enumerate}
+\item Observez puis compilez le programme \texttt{vigenere.cpp} qui implémente le chiffrement de vigenere vu en cours.
+\begin{itemize}
+\item Entrée: un fichier et la clé (un mot de lettres minuscules)
+\item Sortie: le fichier chiffré
+\item Notes:
+\begin{itemize}
+\item On pose les même conditions que pour le chiffrement de Cesar
+\end{itemize}
+\end{itemize}
+\item Testez-le sur des fichiers de votre crû. Chiffrez, puis déchiffrez. 
+\item A quel autre algorithme est-il équivalent pour une longueur de clé de 1 ?
+\end{enumerate}
+
+\subsection{Cryptanalyse}
+On se propose maintenant de casser le chiffrement de vigenere via une attaque de type texte chiffré connu.
+\begin{enumerate}
+\item Déterminez la longueur de la clé:
+\begin{itemize}
+\item Via un programme \texttt{ic} qui va implémenter l'attaque par calcul de l'indice de coïncidence
+\end{itemize}
+\item Créez un programme \texttt{decoup} :
+\begin{itemize}
+\item Entrées: un fichier f, un entier len
+\item Sorties: $len$ fichiers $f_0 \dots f_{len-1}$ tels que $f_i$ contient toutes les lettres de $f$ dont la position dans le texte modulo $len$ est égale à $i$ (découpage en \textit{"colonnes"} vu en cours).
+\end{itemize}
+\item Retrouvez le texte clair à partir du fichier chiffré  \texttt{vigenere1\_chiffre.txt}
+\item Notes:
+\begin{itemize}
+\item L'indice de coïncidence d'un texte français est d'environ 0.08
+\end{itemize}
+\item Cassez le chiffrement du fichier \texttt{vigenere2\_chiffre.txt} et retrouvez le texte en clair
+\begin{itemize}
+\item Attention, celui-là est en anglais
+\end{itemize}
+\item Essayez d'automatiser la découverte de la clé le plus possible
+\end{enumerate}
+
+\section{Réseaux de Feistel}
+
+\begin{enumerate}
+\item Implémentez le réseau de Feistel suivant:
+\begin{itemize}
+\item Longueur de bloc de 64bits
+\item Longueur de la clé de 32 bits
+\item 12 rondes
+\item La fonction $f$ est laissée à votre choix (elle doit être inversible !)
+\item Le générateur de clé $g$ est également laissé à votre choix
+\begin{itemize}
+\item Si vous n'avez pas d'idée, vous pouvez prendre $k_i$=$k+i*x$ où $x$ est un entier quelconque
+\end{itemize}
+\end{itemize}
+\item Testez le chiffrement et le déchiffrement sur des fichiers de votre crû
+\item Observez:
+\begin{itemize}
+\item La confusion du chiffrement
+\item La diffusion du chiffrement
+\end{itemize}
+\end{enumerate}
+
+
+\section{Annexe}
+
+\begin{figure}[!h]
+\center
+\includegraphics[scale=0.4]{freq.png}
+\caption{Fréquence d'apparition des lettres de l'alphabet dans un texte français}
+\end{figure}
+\end{document}

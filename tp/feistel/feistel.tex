@@ -1,0 +1,66 @@
+\documentclass[a4paper]{article}
+
+
+\usepackage[latin1]{inputenc} % LaTeX, comprends les accents !
+\usepackage[T1]{fontenc} % Police contenant les caractères français
+\usepackage{geometry} % Définir les marges
+\usepackage[french,english]{babel}
+\usepackage{graphicx}
+\usepackage{url}
+
+%\pagestyle{fancyheaders}
+\title{\textbf{Cryptographie symétrique: Chiffrement par bloc, permutation}}
+\author{Cours de sécurité: DUT S4}
+\date{2013-2014}
+\begin{document}
+\maketitle
+
+\section{Mise en place du TP}
+
+\begin{enumerate}
+\item Téléchargez l'archive à l'adresse \url{www.labri.fr/~ramet/secu/tp2.zip}. Dezippez-la dans un répertoire "tp2".
+Placez-vous dans ce repertoire et tapez "make".
+\item Vérifiez que tout fonctionne correctement, notamment que l'executable sym-cipher.exe se lance
+\end{enumerate}
+
+\section{L'algorithme de chiffrement}
+
+La distribution contient l'implémentation d'un algorithme de chiffrement élémentaire par bloc
+. Il correspond plus ou moins à une "ronde" d'un réseau de Feistel (exemple: DES). 
+Les messages sont des blocs de 64 bits. La clé (symétrique) a également pour longueur 64 bits. L'algorithme consiste en 2 étapes:
+\begin{enumerate}
+\item xor (ou exclusif) bit à bit entre le message et la clé
+\item mélange des bits du bloc obtenu à l'aide d'une permutation secrète des bits (\texttt{bijection.txt})
+\end{enumerate}
+L'objectif de ce second TP va être de casser cet algorithme, c'est à dire de retrouver \textbf{à la fois} la clé secrète et la permutation secrète.
+
+Pour ce faire, vous avez réussi à intercepter (au péril de votre vie) 1000 couples clair/chiffré, situé dans le fichier plain-cipher.txt. A l'aide de ces couples, on vous demandes de casser l'algorithme de chiffrement, c'est à dire de retrouver à la fois la permutation et la clé qui ont été utilisés.
+
+\section{Prise en main}
+\begin{enumerate}
+\item Placez vous dans le repertoire "bin". Chiffrez un bloc au hasard (sous forme de nombre hexadecimal de 64 bits, par exemple \texttt{02AB2F34EE43E32C}), avec une clé au hasard (également un nombre héxa de 64 bits) à l'aide du binaire \texttt{sym-cipher.exe}.
+La permutation utilisée par l'algorithme de chiffrement est \texttt{tp2/bijection.txt}. Vérifiez via l'option \texttt{--decrypt} que nous avons bien affaire à un algorithme de chiffrement symétrique.
+\item Comment fonctionne le fichier \texttt{bijection.txt} à votre avis (vous pouvez vous aider des sources) ? Vérifiez que si \texttt{bijection.txt} change, le message chiffré est bien différent (pour une même clé évidemment). 
+\item Chiffrez le bloc \texttt{0123456789ABCDEF} avec la clé \texttt{FEDCBA9876543210} (et le fichier bijection.txt). Le résultat était-il prévisible ? Aidez-vous de la commande \texttt{--print-bits} pour bien comprendre le résultat. Si le fichier bijection.txt est modifié, quel sera le résultat ?
+\end{enumerate}
+
+\section{Retrouver la bijection secrète}
+Pour pouvoir casser le chiffrement des exemples situés dans \texttt{plain-cipher.txt}, il va vous falloir dans un premier temps \textbf{retrouver la bijection qui a été utilisée}, avant de \textbf{retrouver la clé} de chiffrement.
+Comme première tâche, vous allez donc devoir retrouver la bijection qui a été utilisée (ce n'est évidemment pas bijection.txt).
+\begin{enumerate}
+\item Chiffrez le bloc \texttt{1010000000000000} avec la clé \texttt{0000000000000000} et la permutation bijection.txt. Affichez le résultat avec la commande \texttt{sym-cipher.exe --print-bits}
+\item De même chiffrez le bloc \texttt{1000000100000000} avec la même clé et la même permutation. Comparez avec le résultat précédent. Que constatez vous ?
+\item Chiffrez ces deux même blocs avec une autre clé au hasard, par exemple \texttt{ABC123DEF4567890}. Constatez-vous toujours la même chose ?
+\item Réflechissez maintenant à un algorithme permettant de retrouver, à partir des 1000 couples clairs/chiffrés de \texttt{plain-cipher.txt}, la bijection secrète qui a été utilisée.
+\item Implémentez votre attaque dans le fichier \texttt{attack/main.c}.
+\end{enumerate}
+
+\section{Retrouver la clé}
+Maintenant que vous disposez de la bijections ecrète, retrouvez très simplement la clé. On gardera à l'esprit que le xor est une opération symétrique:
+\texttt{(a xor b) xor b = a}.
+\begin{enumerate}
+\item A votre avis, combien de couples clair/chiffré seront nécessaire pour retrouver la clé ?
+\item Implémentez l'attaque dans le fichier \texttt{attack/main.c}
+\end{enumerate}
+
+\end{document}

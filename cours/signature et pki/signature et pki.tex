@@ -1,0 +1,501 @@
+\documentclass{beamer}
+\usepackage[french]{babel}
+\mode<presentation>
+\usepackage[latin1]{inputenc}
+\usepackage{color}
+
+\usetheme{Luebeck}
+%\usecolortheme{seahorse}
+\setbeamertemplate{bibliography item}[text]
+\setbeamertemplate{blocks}[rounded][shadow=true]
+
+
+\title[Introduction à la sécurité informatique]{Signature et architectures à clé publique}
+\institute{\textbf{Pierre Ramet:} \texttt{ramet@labri.fr}}
+
+
+\author{DUT S4}
+\date{2013-2014}
+
+%\setcounter{tocdepth}{1}
+\begin{document}
+
+\begin{frame}
+
+  \titlepage
+
+\end{frame}
+
+\AtBeginSubsection[]
+                  {
+                    \begin{frame}<beamer>
+                      \frametitle{Plan}
+                      \tableofcontents[currentsection,currentsubsection,sectionstyle=show/shaded,subsectionstyle=show/shaded/hide]
+                    \end{frame}
+                  }
+\begin{frame}<beamer>
+                      \frametitle{Plan}
+                      \tableofcontents
+                    \end{frame}
+                    
+
+
+\section{Empreinte d'un message}
+\subsection{Le problème}
+\begin{frame}{La cryptologie à clé publique}
+La cryptologie à clé publique 
+\begin{itemize}
+\item Permet de garantir la \textbf{confidentialité} des messages échangés
+\item Ne garantit pas \textbf{l'intégrité} du message
+\item Surtout si le canal de communication n'est \textbf{pas sûr} (ex: Internet)
+\end{itemize}
+\begin{definition}
+Garantir l'intégrité d'un message consiste à pouvoir \textbf{détecter toute modification malicieuse} du message entre le moment de son émission et l'instant où il est reçu
+\end{definition}
+\end{frame}
+
+\begin{frame}{Exemple d'attaque}
+\begin{figure}[!h]
+\includegraphics[scale=0.6]{integritea.png}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Dangers}
+\begin{itemize}
+\item L'attaquant ne peut déchiffrer le message, il ne peut donc modifie que le \textbf{chiffré}
+\item La plupart du temps, la modification aura peu d'incidence (pour un message en français par exemple)
+\item Parfois, les conséquences peuvent être désastreuses
+\begin{itemize}
+\item Exemple précédent
+\item Pas acceptable pour les organisations
+\end{itemize}
+\item A votre avis, comment garantir l'intégrité d'un message ?
+\end{itemize}
+\end{frame}
+
+
+\subsection{Prise d'empreinte d'un message}
+\begin{frame}{Prise d'empreinte d'un message}
+\begin{itemize}
+\item Une empreinte numérique est un \textit{"résumé"} d'un message, aussi appelé condensat
+\item Elle est de taille fixe (souvent entre 128 à 160bits)
+\item Deux documents légèrement différents ont une empreinte très différente
+\begin{itemize}
+\item Propriété de \textbf{non colusion}
+\end{itemize}
+\item Il est très difficile de contruire un document qui ait la même empreinte qu'un autre document
+\begin{itemize}
+\item Propriété de \textbf{"sens unique"}
+\end{itemize}
+\item Algorithmes utilisés: MD5, SHA1
+\item Ces algorithmes sont appelés \textbf{fonction de hachage}
+\end{itemize}
+\end{frame}
+
+
+
+
+\begin{frame}{Fonction de hachage}
+\begin{figure}[!h]
+\includegraphics[scale=0.6]{hash1.png}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Utilisation}
+\begin{itemize}
+\item L'empreinte est utilisée pour vérifier \textbf{l'intégrité} d'un message
+\begin{itemize}
+\item Si le message et son empreinte ne correspondent plus, il y a sûrement eu une
+manipulation du message
+\item L'empreinte ne doit pas pouvoir être reclaculée facilement par un attaquant $\Rightarrow$ \textbf{chiffrement du message+empreinte}
+\item Si le message et l'empreinte sont chiffrés et que l'attaquant ne peut les déchiffrer, il ne pourra les modifier qu'\textbf{aléatoirement} et il y aura de fortes chances que l'empreinte ne corresponde plus au message modifié
+\end{itemize}
+%\item Pour la signature numérique
+%\begin{itemize}
+%\item Afin de permettre de signer un message de longueur arbitrairement long,
+%l'empreinte du message est signée au lieu du message proprement dit
+%\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Qualités d'une fonction de hachage}
+\begin{itemize}
+\item Chaque bit de l'empreinte dépend de l'ensemble des bits du message
+\item le changement d'un bit du message
+d'entrée provoque en moyenne le
+changement de la moitié des bits de l'empreinte
+\item Connaissant $H(m)$, il est difficile de trouver
+$m'$ tel que $H(m)=H(m')$
+\begin{itemize}
+\item Que penser de la fonction de hachage \textit{parité} ?
+\end{itemize}
+\item Rapide à calculer
+\begin{itemize}
+\item Mais pas trop, pour freiner une attaque exhaustive
+\item Exemple: la fonction \texttt{crypt} Unix
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Fonctions de hachages connues}
+\begin{itemize}
+\item MD4 et MD5
+\begin{itemize}
+\item Fonctions produisant des empreintes de 128 bits
+\item Ne sont plus résistantes aux collisions. Il est possible de trouver des
+messages ayant la même empreinte
+\end{itemize}
+\item RIPEMD 128-256
+\begin{itemize}
+\item Fonctions produisant des empreintes de 128 ou de 256 bits
+\end{itemize}
+\item SHA-1 (Secure Hashing Algorithm)
+\begin{itemize}
+\item Standard américain produisant des empreintes de 160 bits
+\item N'est plus résistante aux collisions. Il est possible de trouver des
+messages ayant la même empreinte en $2^{63}$ opérations (moins que les $2^{80}$
+opérations requises pour une attaque exhaustive)
+\end{itemize}
+\item SHA-256 et SHA-512
+\begin{itemize}
+\item Nouveaux standards (256 et 512bits)
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\subsection{Protocole: garantir l'intégrite d'un message}
+
+\begin{frame}{L'idée}
+Bob veut envoyer un message $M$ à Alice:
+\begin{itemize}
+\item Il concatène à la fin du message $M$ l'empreinte $E=H(M)$ du-dit message
+\item Le message $M+E$ ainsi obtenu est chiffré avec la clé publique d'Alice et envoyé à Alice
+\item Alice recoit et déchiffre le message (éventuellement modifié par un attaquant) $M'+E'$
+\begin{itemize}
+\item Si $E'=H(M')$, alors le message $M'$ n'a pas été altéré (c'est le message $M$ original)
+\item Dans le cas contraire, le message est mis à la poubelle
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Le protocole}
+\begin{figure}[!h]
+\includegraphics[scale=0.35]{integritep.png}
+\end{figure}
+\begin{itemize}
+\item Pourquoi ça marche ?
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Attaques}
+Ce protocole permet de résister aux attaques suivantes (dans tous les cas, l'empreinte et le message sont chiffrés):
+\begin{itemize}
+\item L'attaquant intercepte un message. Il modifie le message sans modifier l'empreinte et l'envoie
+\item L'attaquant intercepte un message. Il modifie le message ainsi que (aléatoirement) l'empreinte  
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Paradoxe des anniversaires}
+Pourquoi augmenter la taille de l'empreinte ?
+\begin{itemize}
+\item Il suffit de 23 personnes pour qu'il y ait plus d'une chance sur
+deux pour que parmi elles deux personnes soient nées le
+même jour !
+\item Une fonction de hachage générant une empreinte de n bits donne $2^n$ sorties différentes
+\item D'après le paradoxe des anniversaires on a une chance sur deux de retrouver un
+message ayant une empreinte donnée en $2^{n/2}$
+essai
+\item Augmenter $n$ (Actuellement, plus de 128 bits)
+\end{itemize}
+\end{frame}
+
+
+\section{Signature}
+\subsection{Le problème}
+\begin{frame}{Problème}
+Le problème:
+\begin{itemize}
+\item Le protocole présenté précédemment garantis la \textbf{confidentialité} ainsi que l'\textbf{intégrité} du message
+\item Mais pas son \textbf{authenticité} !
+\item Qu'est ce qui empêche Oscar de:
+\begin{itemize}
+\item Chiffrer un message avec la clé publique d'Alice
+\item Lui envoyer en se faisant passer pour Bob ?
+\end{itemize}
+\end{itemize}
+\begin{definition}
+Un message est dit authentique si son expéditeur est bien celui auquel on s'attend, il n'y a pas eu usurpation d'identité.
+\end{definition}
+\end{frame}
+
+\begin{frame}{Exemple}
+\begin{figure}[!h]
+\includegraphics[scale=0.7]{cheque.png}
+\end{figure}
+\begin{itemize}
+\item Qu'est-ce qui garantit l'intégrité ?
+\item Qu'est-ce qui garantit l'authenticité ?
+\end{itemize}
+\end{frame}
+
+
+\subsection{Solution: la signature numérique}
+\begin{frame}{Objectifs}
+Transposition au monde numérique
+\begin{itemize}
+\item La signature permet de :
+\begin{itemize}
+\item Garantir l'\textbf{intégrité} du message
+\item Garantir l'\textbf{authenticité} du message !
+\end{itemize}
+\item Presque équivalent à une signature "classique" manuscrite
+\begin{itemize}
+\item \textbf{Intégrité} : ajout d'une empreinte au message 
+\item \textbf{Authenticité} : Utilisation de cryptographie à clé publique
+\begin{itemize}
+\item A votre avis, comment garantir l'authenticité ?
+\end{itemize}
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+
+
+
+
+
+
+\subsection{Protocole}
+\begin{frame}{Protocole de signature numérique}
+\begin{itemize}
+\item Bob veut envoyer un message $M$ de maniere authentifiée et sûre à Alice:
+\begin{enumerate}
+\item Il va calculer une empreinte $E=H(M)$  du message
+\item Il va chiffrer l'empreinte avec sa \textbf{clé privée}
+\begin{itemize}
+\item Seul Bob peut le faire
+\end{itemize}
+\item Il va concaténer l'empreinte chiffrée au message $M$ et envoyer $M+E$ à Alice
+\item Le message final est éventuellement chiffré avec la clé publique d'Alice si l'on veut en plus assurer la \textbf{confidentialité}
+\end{enumerate}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Vérification de la signature}
+\begin{itemize}
+\item Alice reçoit le message signé de Bob. Elle va:
+\begin{enumerate}
+\item Déchiffrer le message avec sa clé privée si il a été chiffré par Bob
+\item Séparer $M'$ et $E'$
+\item Déchiffrer $E'$ avec la \textbf{clé publique} de Bob
+\item \textbf{Vérifier} si l'empreinte $E'$ est bien valide pour $M'$
+\end{enumerate}
+\item Si c'est le cas, elle sait que:
+\begin{itemize}
+\item C'est bien Bob qui a envoyé le message. Pourquoi ?
+\item Le message n'a pas été modifié par un tiers. Pourquoi ?
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Illustration du protocole (sans confidentialité)}
+\begin{figure}[!h]
+\includegraphics[scale=0.35]{signaturep.png}
+\end{figure}
+\end{frame}
+
+
+\begin{frame}{Algorithmes utilisés}
+\begin{itemize}
+\item La signature \textbf{RSA}
+\begin{itemize}
+\item On chiffre l'empreinte via l'algorithme RSA (et la clé privée évidemment)
+\end{itemize}
+\item La signature \textbf{DSA}
+\begin{itemize}
+\item Chiffrement de l'empreinte basé sur le problème du Logarithme Discret 
+\end{itemize}
+\item Et bien d'autres 
+\begin{itemize}
+\item Courbes elliptiques, etc
+\item Toute fonction à sens unique et à brêche secrète peut être utilisée
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Récapitulatif}
+\begin{itemize}
+\item Pour \textbf{authentifier} un message (ainsi qu'assurer son \textbf{intégrité}) on peut le \textbf{signer}:
+\begin{itemize}
+\item Calcul de l'empreinte du message $rightarrow$ \textbf{intégrité}
+\item Chiffrement de l'empreinte avec la clé privée via un algorithme asymétrique $rightarrow$ \textbf{authenticité}
+\end{itemize}
+\item Tout algorithme de chiffrement asymétrique peut être utilisé
+\begin{itemize}
+\item Signature RSA
+\item Signature DSA
+\item Courbe elliptiques, etc.
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+
+\section{Infrastructure à clé publique}
+\subsection{Le problème}
+\begin{frame}{Le point noir de la cryptographie à clé publique}
+\begin{itemize}
+\item La cryptographie asymétrique repose essentiellement sur l'authenticité des clés publiques
+\begin{itemize}
+\item Bob publie sa clé publique sur son site web perso
+\item Oscar s'introduit sur le site et remplace la clé publique de Bob par la sienne
+\item Une personne veut envoyer un message à Bob, elle récupère la clé publique sur le site de Bob
+\item Oscar peut alors déchiffrer le message adressé à Bob !
+\end{itemize}
+\item Ces clés n'ont pas forcément besoin d'être transmises de façon
+confidentielle, mais elles se doivent d'être transmises de façon
+à s'assurer de leurs authenticités
+\item Solution: utiliser un organisme de \textbf{confiance} pour distribuer les clés publiques
+\end{itemize}
+\end{frame}
+
+\subsection{Le modèle hierarchique}
+
+\begin{frame}{Infrastructure à clé publique}
+Deux modèles:
+\begin{itemize}
+\item Modèle hiérarchique
+\begin{itemize}
+\item Infrastructure à clé publique (ICP). En anglais: Public key infrastructure (PKI)
+\item Utilisé par les organismes commerciaux et gouvernementaux
+\item Autorité centrale
+\end{itemize}
+\item Réseau de confiance (Web of trust)
+\begin{itemize}
+\item Modèle distribué sans autorité centrale
+\item Utilisé par le logiciel PGP
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Modèle hierarchique (2)}
+\begin{itemize}
+\item Le modèle repose sur une autorité certifiant (signant avec sa clé privée) les clés des divers intervenants
+\item Le rôle de l'autorité de certification (Certification Authority ou
+CA) est de s'assurer de la validité de la correspondance entre le nom d'une personne et une clé publique
+\begin{itemize}
+\item Le CA émet des certificats X.509 aux personnes qu'elle a pu authentifier
+\end{itemize}
+\item Il n'ya plus qu'un seul acteur à qui faire confiance: le CA
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Comment ça marche ?}
+\begin{itemize}
+\item Distribution du certificat "root" du CA à tous les intervenants
+\begin{itemize}
+\item Certificat autosigné càd que le CA signe son propre certificat
+\item Le certificat est distribué de façon sécurisée : par exemple avec le système
+d'exploitation
+\end{itemize}
+\end{itemize}
+\begin{figure}[!h]
+\includegraphics[scale=0.4]{ca1.png}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Certification du client}
+\begin{itemize}
+\item Chaque intervenant s'inscrit (une seule fois) au CA afin qu'il puisse être identifié
+par les autres intervenants
+\item Il donne des preuves de son identité (carte d'identité, passeport)
+\begin{itemize}
+\item L'intervenant reçoit un certificat qui l'identifie, signé par le CA (avec la clé privée du CA)
+\end{itemize}
+\end{itemize}
+\begin{figure}[!h]
+\includegraphics[scale=0.4]{ca2.png}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Identification d'un intervenant}
+\begin{itemize}
+\item Chaque intervenant ayant un certificat peut "prouver" son
+identité à tout autre intervenant ayant confiance au CA
+\begin{figure}[!h]
+\includegraphics[scale=0.4]{ca3.png}
+\end{figure}
+\item Bob valide le certificat avec la clé publique du CA. 
+\item Si le certificat d'Alice est valide, Bob accepte la clé publique d'Alice
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Problèmes du modèle hierarchique}
+Problèmes du modèle hierarchique:
+\begin{itemize}
+\item Comment distribuer de manière sûre le certificat root du CA ?
+\item Comment intégrer les certificats dans une application usager ?
+\item Si le CA et tous ses sous-serveurs tombent en panne ?
+\item La certification est \textbf{payante}
+\end{itemize}
+\end{frame}
+
+\subsection{Le réseau de confiance}
+\begin{frame}{Modèle du réseau de confiance}
+\begin{itemize}
+\item Ce modèle du \textbf{réseau de confiance} est simple et sans autorité
+centrale
+\item Utilisé par PGP
+\item Chaque intervenant construit son réseau de confiance
+\begin{itemize}
+\item Il peut décider de faire confiance à un autre intervenant qui lui donne
+directement son certificat (+ des preuves type carte d'identité)
+\item Il peut décider de faire pleine confiance à tout intervenant "connu" par
+\textbf{un autre intervenant} en qui il a pleine confiance
+\item Plusieurs variantes de cette règle:
+\begin{itemize}
+\item Doit être connu par plus d'un intervenant en qui il a pleine confiance
+\item Peut avoir une confiance relative en ce nouvel intervenant
+\end{itemize}
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Problèmes}
+Problèmes du réseau de confiance
+\begin{itemize}
+\item Est-ce que les amis de mes amis sont mes amis ?
+\item Idéal pour un milieu informel, mais non pour une application
+où le cadre juridique est important
+\begin{itemize}
+\item Judiciaire
+\item Gouvernemental
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Récapitulatif}
+\begin{itemize}
+\item Pour \textbf{authentifier} un message (ainsi qu'assurer son \textbf{intégrité}) on peut le \textbf{signer}:
+\begin{itemize}
+\item Calcul de l'empreinte du message
+\item Chiffrement de l'empreinte avec la clé privée via un algorithme asymétrique
+\end{itemize}
+\item Mais pour vérifier la signature, il faut avoir \textbf{confiance dans la clé publique}
+\item La certification essaye de résoudre ce problème
+\begin{itemize}
+\item Le modèle hierarchique
+\begin{itemize}
+\item Une autorité de certification signe des clés publique en échange de preuves d'identité
+\item Tout le monde fait confiance au CA
+\end{itemize}
+\item Le réseau de confiance
+\begin{itemize}
+\item Les amis de mes amis sont mes amis
+\end{itemize}
+\end{itemize}
+\end{itemize}
+\end{frame}
+\end{document}

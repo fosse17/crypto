@@ -1,0 +1,761 @@
+\documentclass{beamer}
+\usepackage[french]{babel}
+\mode<presentation>
+\usepackage[latin1]{inputenc}
+\usepackage{color}
+
+\usetheme{Luebeck}
+%\usecolortheme{seahorse}
+\setbeamertemplate{bibliography item}[text]
+\setbeamertemplate{blocks}[rounded][shadow=true]
+
+
+\title[Introduction à la sécurité informatique]{Protection logicielle et reverse engineering}
+\institute{\textbf{Pierre Ramet:} \texttt{ramet@labri.fr}}
+
+
+\author{DUT S4}
+\date{2013-2014}
+
+%\setcounter{tocdepth}{1}
+\begin{document}
+
+\begin{frame}
+
+  \titlepage
+
+\end{frame}
+
+\AtBeginSubsection[]
+                  {
+                    \begin{frame}<beamer>
+                      \frametitle{Plan}
+                      \tableofcontents[currentsection,currentsubsection,sectionstyle=show/shaded,subsectionstyle=show/shaded/hide]
+                    \end{frame}
+                  }
+\begin{frame}<beamer>
+                      \frametitle{Plan}
+                      \tableofcontents
+                    \end{frame}
+                    
+
+\section{Introduction à la protection logicielle}
+\subsection{Qu'est-ce que le reverse engineering ?}
+
+\begin{frame}{Le reverse engineering}
+\begin{definition}
+Le reverse engineering, traduit en français par rétro-ingénierie, est l'activité qui consiste à \textbf{étudier un objet} pour en déterminer le \textbf{fonctionnement} interne ou sa méthode de fabrication.
+\end{definition}
+\end{frame}
+
+\begin{frame}{Objectifs du RE}
+\begin{itemize}
+\item Plusieurs objectifs peuvent motiver une ingénierie inverse:
+\begin{itemize}
+\item Comprendre le fonctionnement de cet objet, pour être en mesure de l'utiliser correctement ou de le modifier
+\item Fabriquer une copie de cet objet alors qu'on ne peut en obtenir ni les plans ni les méthodes de fabrication 
+\begin{itemize}
+\item Activité généralement illégale sur un plan juridique
+\end{itemize}
+\item Créer un nouvel objet ayant des fonctionnalités identiques à l'objet de départ, sans violer de brevet
+\item Analyser un objet produit par un concurrent, soit dans le cadre d'une activité de veille concurrentielle soit pour détecter de potentielles violations de brevets
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Applications légales du reverse engineering}
+Le reverse engineering a le plus souvent une application légale
+\begin{itemize}
+\item Etude d'un protocole réseau pour son portage sur d'autres plateformes (exemple: samba)
+\item Etude d'un format de fichier pour son portage sur d'autres plateformes (exemple: OpenOffice et les .doc)
+\item Veille technologique: vérifier que vos concurrents ne violent pas vos brevets
+\item Etude de malwares: comprendre les virus/vers/rootkits pour mieux s'en défendre
+\item Recherche de vulnérabilité dans un logiciel
+\begin{itemize}
+\item Légal pour les entreprises agrémentées (exemple Guillermito)
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Applications illégales}
+... mais est également utilisé à des fins illégales
+\begin{itemize}
+\item Espionnage industriel
+\begin{itemize}
+\item Vol d'algorithmes ou même de logiciels d'une entreprise concurrente
+\end{itemize}
+\item Piratage de logiciel
+\begin{enumerate}
+\item Etude du logiciel via Reverse Engineering
+\item Localisation des moyens de protection
+\begin{itemize}
+\item Vérification du numéro de série, protection anti-copie, ...
+\end{itemize}
+\item Publication sur internetd'un patch supprimant les protections
+\end{enumerate}
+\item Etude des vulnérabilités d'un logiciel en vue d'une exploitation
+\end{itemize}
+
+\end{frame}
+
+
+\subsection{Les outils pour le reverse engineering}
+\begin{frame}{Analyse statique}
+\begin{definition}
+L'analyse statique d'un programme est un processus permettant d'évaluer un programme ou une partie d'un programme en se basant sur sa forme, sa structure, son contenu ou sa documentation. A opposer à l'\textit{analyse dynamique}.
+\end{definition}
+\begin{itemize}
+\item Reviens à examiner le programme \textit{comme si} on lisait un fichier texte normal. On ne l'exécute pas.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Les désassembleurs}
+\begin{itemize}
+\item Outil le plus souvent utilisé pour l'analyse statique semi-automatisée
+\item Un désassembleur permet à partir d'un exécutable binaire, d'obtenir son code en langage machine. Le code obtenu ne contient bien sur plus aucun commentaire ni labels
+\item Les désassembleurs les plus performants arrivent à retrouver le type des variables, permettent de les renommer et, si ils le peuvent, génèrent automatiquement un nom à partir de l'utilisation qui en est fait
+\item Le désassembleur le plus utilisé et le plus général en environnement win32 est IDA. Il existe d'autres désassembleur qui ciblent des exécutables générés par des compilateurs précis mais nous ne les aborderons pas dans ce cour
+\end{itemize}
+\end{frame}
+
+\begin{frame}{IDA}
+\begin{itemize}
+\item IDA est un désassembleur professionnel très puissant qui permet à l'utilisateur de s'approprier le code d'une application grâce à l'analyse très fine qu'il fait du code, de l'utilisation des registres et de la pile
+\item Cette analyse lui permet d'isoler les fonctions, leurs relations, leurs variables locales etc.
+\item Certains plugins (très chers) permettent même dans certains cas de retrouver le code source originel du programme analysé
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Exemple IDA}
+\begin{figure}[!h]
+\includegraphics[scale=0.3]{ida.png}
+\end{figure}
+\end{frame}
+
+
+\begin{frame}{Analyse dynamique}
+\begin{definition}
+L'analyse dynamique d'un programme est le processus permettant d'évaluer un programme ou une partie d'un programme en se basant sur son comportement à \textbf{l'exécution}
+\end{definition}
+\end{frame}
+
+\begin{frame}{Les debogueurs}
+\begin{itemize}
+\item Un débogueur permet, comme son nom l'indique, de déboguer un programme, c'est-à-dire de suivre son déroulement pas à pas, de contrôler son exécution grâce à des points d'arrêt, la possibilité de modifier le contenu des registres, de la mémoire etc.
+\item Les débogueurs sont plus intrusifs que les désassembleurs comme IDA. Ils permettent néanmoins de mieux analyser le programme, étant donné que l'on observe son comportement \textit{in vivo}
+\item Un avantage est également la possibilité de \textbf{modifier} le programme au cours de son exécution (exemple: ne pas exécuter une routine de vérification de license)
+\item Lors des TPs, nous utiliserons OllyDbg, un debogueur très utilisé et gratuit
+\end{itemize}
+\end{frame}
+
+\begin{frame}{OllyDbg}
+\begin{figure}[!h]
+\includegraphics[scale=0.3]{olly.png}
+\end{figure}
+\end{frame}
+
+
+\subsection{Les enjeux de la protection logicielle}
+\begin{frame}{Pourquoi protéger son logiciel ?}
+\begin{itemize}
+\item Les désassembleurs et les débogueurs permettent d'étudier un exécutable sans posséder sa source
+\item Protéger les logiciels d'une entreprise est alors indispensable
+\begin{itemize}
+\item Pour éviter l'espionnage industriel
+\begin{itemize}
+\item Perte de leadership par exemple
+\end{itemize}
+\item Pour ne pas qu'il soit piraté
+\begin{itemize}
+\item Perte de revenu pour l'entreprise
+\end{itemize}
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Le coût du piratage en France}
+Le coût du piratage dans le monde / en France:
+\begin{figure}[!h]
+\begin{tabular}{|c|c|c|}
+\hline
+\textbf{Année} & \textbf{Taux de piratage} & \textbf{Manque à gagner en M\$}\\
+\hline
+2003 & 36\%/45\% & 28 803 / 2 311 \\
+\hline
+2004 & 35\%/45\% & 32 778 / 2 928 \\
+\hline
+2005 & 35\%/47\% & 34 482 / 3 191 \\
+\hline
+2006 & 35\%/45\% & 39 698 / 2 676 \\
+\hline
+2007 & 38\%/42\% & 47 809 / 2 601 \\
+\hline
+\end{tabular}
+\caption{Source: BSA and IDC Global Software Piracy Study}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Comment protéger son logiciel ?}
+\begin{itemize}
+\item Juridiquement
+\begin{itemize}
+\item Tous les logiciels sont protégés par le droit d'auteur
+\item Déposer un brevet pour une technologie innovante
+\end{itemize}
+\item En bloquant ou freinant le piratage du logiciel
+\begin{itemize}
+\item En obfuscant le code binaire du programme
+\item En détectant et en bloquant les tentatives de reverse engineering du logiciel
+\item En utilisant des mesures préventives (Version de démo incomplètes, vérification à distance du numéro de license, ...)
+\item En utilisant des outils de protection professionnels
+\end{itemize}
+\item En utilisant des mesures punitives
+\begin{itemize}
+\item Watermarking, ou comment retrouver l'origine d'un logiciel piraté
+\item Blacklisting des licenses de logiciels piratés
+\item Recours en justice
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+
+
+
+
+
+\begin{frame}{Objectifs de ce cours}
+\begin{itemize}
+\item Le piratage logiciel est une grande nuisance pour l'entreprise
+\item La faute en revient souvent aux développeurs :
+\begin{itemize}
+\item Qui sous-estiment le problème posé par la rétro-ingénierie
+\item Qui essayent de protéger eux-mêmes leur application
+\item Qui utilisent mal les protections commerciales
+\end{itemize}
+\item \textbf{Objectifs de ce cours}
+\begin{itemize}
+\item Introduction à la protection logicielle et au reverse engineering
+\end{itemize}
+\end{itemize}
+
+\end{frame}
+
+\section{Techniques de protection simples}
+\subsection{Le numéro de série}
+\begin{frame}{Protection par numéro de série}
+\begin{itemize}
+\item La protection la plus intuitive pour protéger un logiciel est la vérification d'un numéro de série
+\begin{itemize}
+\item Si celui-ci est valide, le logiciel fonctionne
+\item Si il est invalide, le logiciel ne démarrera pas ou sera bridé
+\end{itemize}
+\item \textbf{Atouts}
+\begin{itemize}
+\item Très simple à implémenter ($if(num\_serie!=1234)~ exit();$)
+\item Nombre d'algorithmes de vérification du numéro de série infini
+\item Possibilité de vérification du numéro sur internet
+\end{itemize}
+\item \textbf{Inconvénients}
+\begin{itemize}
+\item Une simple analyse statique permet parfois de retrouver le numéro de série
+\item Il est toujours possible de ne pas exécuter la routine de vérification
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Exemple}
+\begin{figure}[!h]
+\includegraphics[scale=0.4]{serial.png}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Comment pallier à ces défauts ?}
+\begin{itemize}
+\item \textbf{Défauts de cette méthode}
+\begin{itemize}
+\item Toujours possible de désassembler et analyser la routine de vérification
+\item Possible de modifier l'application pour fausser la vérification
+\end{itemize}
+\item \textbf{Solutions}
+\begin{itemize}
+\item Obfusquer le code machine de la routine vérification
+\item Chiffrement du code machine de la routine vérification
+\item Utilisation d'algorithmes asymétriques
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\subsection{Obfuscation de code}
+\begin{frame}{L'obfuscation}
+\begin{itemize}
+\item L'obfuscation a pour but de par l'homme d'une application \textbf{incompréhensible} directement \textbf{par l'homme}
+\item Le code devra être traité avant de pouvoir être analysé et si l'obfuscation est bien faite, la programmation d?un outil qui éliminera entièrement et automatiquement l'obfuscation sera quasi impossible
+\item En théorie cependant, il est impossible d'obfusquer parfaitement un programme (Barak)
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Différentes sortes d'obfuscations}
+\begin{itemize}
+\item Rendre le code le moins clair possible, utiliser des moyens détournés pour arriver au même résultat :
+\begin{block}{Exemple}
+$var1 = var2 + var3$ $\rightarrow$ $var1 = (var1 + var2*const + var3*const - var 1) / const$
+\end{block}
+\item Insertion de code inutile, ou code "mort"
+\begin{block}{Exemple}
+$var1 += var2 [\dots] var1 -= var2$ \\
+if(TRUE) $\{ ... \}$ else $\{ ... \}$
+\end{block}
+\item Obfusquer le flot de contrôle, ajout de sauts inutiles, appels de fonctions inutils, "mélanger" les instructions
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Quoi obfusquer ?}
+\begin{itemize}
+\item Souvent, on preferera obfusquer le code machine d'un programme (c'est ce que voit le reverse engineerer) plutôt qu'obfusquer son code source
+\begin{itemize}
+\item Obfusquer le code source nuit à la maintenance
+\item Le compilateur effectuera de toute manière des optimisations
+\end{itemize}
+\item Il ne faut pas obfusquer \textbf{tout} le programme
+\begin{itemize}
+\item Perte de performance
+\end{itemize}
+\item Seulement les fonctions critiques
+\begin{itemize}
+\item Vérification du numéro de séries
+\item Algorithmes à forte valeur ajoutée
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Exemple d'obfuscation}
+\begin{itemize}
+\item Obfuscation du code \texttt{mov al, byte ptr [edi]}
+\end{itemize}
+\begin{figure}[!h]
+\includegraphics[scale=0.4]{obfu.png}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Autre exemple}
+\begin{figure}[!h]
+\includegraphics[scale=0.35]{obfu2.png}
+\end{figure}
+\begin{itemize}
+\item Ici le débogueur n'est même plus capable d'analyser correctement le code machine
+\end{itemize}
+\end{frame}
+
+
+\subsection{Chiffrement de code}
+\begin{frame}{Le chiffrement de code}
+\begin{itemize}
+\item En assembleur, le code peut être manipulé comme des données
+\item Le code sensible de l'application est stocké chiffré sur le disque dur
+\begin{itemize}
+\item Il apparaît chiffré lors de l'analyse statique
+\end{itemize}
+\item A l'exécution seulement, le code sensible est déchiffré, avant d'être exécuté
+\item cf. exemple au tableau
+\item Pour compliquer la tâche, la routine de déchiffrement est souvent obfusquée
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Code chiffré}
+\begin{itemize}
+\item Code chiffré
+\end{itemize}
+\begin{figure}[!h]
+\includegraphics[scale=0.4]{chiffre.png}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Code dechiffré}
+\begin{itemize}
+\item Code dechiffré
+\end{itemize}
+\begin{figure}[!h]
+\includegraphics[scale=0.4]{dechiffre.png}
+\end{figure}
+\end{frame}
+
+
+\begin{frame}{Avantages/inconvénients}
+\begin{itemize}
+\item \textbf{Avantages:}
+\begin{itemize}
+\item Les routines importantes du programme n'apparaissent pas en clair avant d'être exécutée
+\item Rend beaucoup plus difficile l'analyse statique
+\item Associé à l'obfuscation, souvent efficace contre les crackeurs amateurs
+\begin{itemize}
+\item Certaines routines de déchiffrement, une fois obfusquée, font en effet plusieurs Mo
+\end{itemize}
+\end{itemize}
+\item \textbf{Inconvénients}
+\begin{itemize}
+\item L'analyse dynamique est toujours possible
+\begin{itemize}
+\item A condition de savoir où s'arrêter pour regarder (par exemple, juste après le déchiffrement des routines importantes)
+\end{itemize}
+\item Il est toujours possible d'enregistrer le programme une fois que toutes les routines ont été déchiffrées (\textit{dumping})
+\end{itemize}
+\end{itemize}
+
+\end{frame}
+
+\subsection{Vérifications furtives}
+\begin{frame}{Vérifications furtives}
+\begin{itemize}
+\item Le debogage est surement le processus de reverse engineering le plus puissant
+\item Il est cependant un peu intrusif, et il est donc possible de détecter dans un programme si l'on est en train d'être debogué
+\item La plupart des protections embarquent donc des tests anti-debogage:
+\begin{itemize}
+\item Si aucun debogeur n'est détecté, le programme se déroule normalement
+\item Si un débogeur (ou toute modification du programme) est détecté, le programme agira d'une manière erronnée
+\end{itemize}
+\item L'idée est de modifier le programme de la manière la plus subtile possible
+\begin{itemize}
+\item Le cracker se rendra compte que son piratage du logiciel n'a été détecté que le plus tard possible
+\item ... et devra donc recommencer depuis le début
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Exemple}
+\begin{itemize}
+\item Modification furtive (Vietcong)
+\end{itemize}
+\begin{figure}[!h]
+\includegraphics[scale=0.4]{furtive.png}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Vérifications possibles}
+\begin{itemize}
+\item Vérification d'intégrité du code
+\begin{itemize}
+\item Détecte les modifications (patch) du logiciel
+\end{itemize}
+\item Appels d'APIs spécialisée
+\begin{itemize}
+\item \texttt{CheckRemoteDebugger}, \texttt{IsDebuggerPresent}, etc
+\end{itemize}
+\item Vérification des temps d'exécution
+\begin{itemize}
+\item Un debogeur est toujours plus lent que l'exécution simple du programme
+\end{itemize}
+\item Induire le débogeur en erreur
+\begin{itemize}
+\item Effacement des points d'arret, exceptions multiples, multi-threading, etc.
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Les protections maison}
+\begin{itemize}
+\item La plupart des logiciels amateurs ne sont pas protégés, ou alors par un simple numéro de série
+\item Quelque fois des protections plus sophistiquées sont appliquées (chiffrement, obfuscation)
+\item Dans tous les cas, ce sont souvent des protection \textit{triviales}, qui ne posent aucun frein à un pirate compétent
+\item C'est pourquoi protéger soi-même son logiciel est souvent une \textbf{mauvaise idée}
+\item Pour le milieu proferssionnel, mieux vaut utiliser des \textbf{solutions de protection existantes}
+\end{itemize}
+\end{frame}
+
+
+\section{Techniques avancées: les packers}
+\subsection{Définitions et avantages des packers}
+
+\begin{frame}{Qu'est-ce qu'un packer ?}
+\begin{itemize}
+\item C'est un logiciel chargé de protéger votre programme
+\item Il s'insère dans votre logiciel pour
+\begin{itemize}
+\item \textbf{Protéger le logiciel} contre le reverse engineering
+\item Faire en sorte que si la protection est enlevée, le logiciel devient inutilisable
+\item Ajouter un mécanisme de \textbf{vérification de license}
+\item Parfois \textit{compresser} le programme (d'ou le nom de \texttt{packer})
+\end{itemize}
+\item De nombreuses solutions existent 
+\begin{itemize}
+\item Themida
+\item StarForce
+\item MCFACT
+\item AsPro, etc.
+\end{itemize}
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{Qu'est-ce qu'un packer ?}
+\begin{itemize}
+\item Logiciel de protection logicielle (\textit{packer}) :
+\end{itemize}
+\begin{figure}[!h]
+\includegraphics[scale=0.5]{packer.png}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Comment est protégée votre application}
+\begin{itemize}
+\item Le code de votre programme est \textbf{chiffré}
+\item La routine de déchiffrement est située dans le \textit{packer}
+\begin{itemize}
+\item Packer qui contient les routines de validation de license
+\end{itemize}
+\item Pour pirater le programme, il faut donc \textit{neutraliser} le packer (on parle d'\textit{unpacking})
+\item Le code du packer est quant à lui développé par des experts en sécurité
+\begin{itemize}
+\item Extrêmement protégé (chiffrement, obfuscation de qualité etc.)
+\item Rebute la plupart des crackeurs amateurs
+\end{itemize}
+\end{itemize}
+
+\end{frame}
+
+
+\begin{frame}{Avantage des packers professionnel}
+\begin{itemize}
+\item Ils sont techniquement plus aboutis que les protections maisons
+\begin{itemize}
+\item Utilisation de drivers de protection
+\item Chiffrement, obfuscation, vérification du numéro de série sur internet, la totale
+\end{itemize}
+\item Plus fiables
+\item Certaines offres sont très pointues, et se basent sur des matériels qu'il est très dûr de \textit{reverser}
+\begin{itemize}
+\item Dongle USB, carte à puce
+\item exemple MCFACT (Cubase): la protection a tenu plus d'un an
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+
+
+\subsection{Protections contre le reverse engineering}
+\begin{frame}{Mesures logicielles}
+\begin{itemize}
+\item Anti-desassembleurs
+\begin{itemize}
+\item Le plus efficace restant le \textbf{chiffrement}
+\end{itemize}
+\item Anti-debogeurs
+\begin{itemize}
+\item Peuvent cibler un ou plusieurs debogueurs
+\item Il est cependant toujours possible à un cracker averti de els éviter
+\end{itemize}
+\item Obfuscation à outrance
+\item Utilisation de drivers noyau
+\begin{itemize}
+\item Les routines de vérification sont situées dans un driver windows
+\item Il est très difficle d'analyser un driver "\textit{blindé}"
+\end{itemize}
+\item Utilisation de périphériques sécurisés (ex: carte à puce)
+\begin{itemize}
+\item Ces périphériques sont protégés \textbf{physiquement}
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Un anti-debugeur}
+\begin{itemize}
+\item Anti-débogueur exploitant une faille de OllyDBG :
+\end{itemize}
+\begin{figure}[!h]
+\includegraphics[scale=0.4]{antiolly.png}
+\end{figure}
+\end{frame}
+
+
+
+
+\subsection{Fusion avec l'application}
+\begin{frame}{Fusion avec l'application}
+\begin{itemize}
+\item Même si la routine de vérification de license est extrêmement protégée au sein du packer ...
+\item .. il y a toujours le risque qu'elle soit supprimée tout bonnement
+\item Aussi les packers professionnels se doivent de \textbf{fusionner} avec l'application protégée
+\begin{itemize}
+\item Si le packer est \textbf{supprimé} ou \textbf{modifié}, le programme sera \textbf{inutilisable}
+\item Le plus souvent, ce sont des vérifications \textit{furtives}
+
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Exemple: les triggers de SecuROM}
+\begin{itemize}
+\item SecuROM est une packer utilisé dans la protection des jeux vidéos, il a beaucoup fait parler de lui en 2002 avec une nouvelle forme de protection anti-cracking : les \textit{triggers}
+\item Les triggers sont une fonctionnalité offerte par SecuROM qui permet aux développeurs d'utiliser les APIs Windows pour réaliser des vérifications furtives du code pour s'assurer que la protection du jeux n'a pas été enlevée
+\item Certains appels aux API windows dans l'application protégée sont redirigés vers le packer
+\begin{itemize}
+\item Si un argument spécial est donné, le packer renvoit une valeur prédéfinie
+\item Sinon, il appelle l'API windows qui a été détournée
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Redirection d'APIs}
+\begin{figure}[!h]
+\includegraphics[scale=0.4]{securom1.png}
+\end{figure}
+\end{frame}
+
+
+\begin{frame}{Pourquoi ça marche}
+\begin{itemize}
+\item Si un cracker veut supprimer la protection (le packer), il va devoir \textit{rerediriger} les appels aux APIs qui ont été détournés
+\item C'est facile, sauf que:
+\begin{itemize}
+\item Lorsque l'API windows sera appelée avec l'argument spécial ...
+\item .. la valeur spéciale ne sera pas retournée (c'était le code du packer qui s'en chargeait)
+\end{itemize}
+\item Le programmeur de l'application quant à lui, effectue des tests sur la valeur de retour
+\item Si la valeur de retour n'est pas celle attendue, il sait que le packeur a été supprimé
+\begin{itemize}
+\item Vérifications \textit{furtives}
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Exemple}
+\begin{itemize}
+\item Exemple d'application (mal) déprotégée
+\end{itemize}
+\begin{figure}[!h]
+\includegraphics[scale=0.4]{securom2.png}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Exemple}
+\begin{itemize}
+\item Exemple de jeux (mal) déprotégé (Vietcong): vérification furtive
+\end{itemize}
+\begin{figure}[!h]
+\includegraphics[scale=0.4]{furtive.png}
+\end{figure}
+\end{frame}
+
+\subsection{Virtualisation}
+\begin{frame}{VMProtect: Virtualisation de code}
+\begin{itemize}
+\item VMProtect va virtualiser le code de l'application c'est-à-dire créer un processeur virtuel logiciel qui interprétera les instructions qui auront été transformées au depart
+\item Le code ainsi transformé ne pourra pas être désassemblé par les désassembleur x86 et ne pourra pas être débogué directement
+\item La virtualisation est utilisée dans toutes les protections récentes de qualité
+\item Elle bloque le cracker qui devra étudier le processeur logiciel et créer un outils qui fera la relation  instruction du processeur logiciel $\rightarrow$ instruction x86
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Fonctionnement d'un programme normal}
+\begin{figure}[!h]
+\includegraphics[scale=0.4]{virtu.png}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Un programme Virtualisé}
+\begin{figure}[!h]
+\includegraphics[scale=0.4]{virtu2.png}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Au final}
+\begin{itemize}
+\item Il devient très difficile à un pirate de reverser une application protégée par un packer professionnel
+\begin{itemize}
+\item Egalement très couteux pour les protections matérielles
+\end{itemize}
+\item La protection parfaite n'existe pas (c'est théoriquement \textbf{impossible})
+\item Le but est de \textbf{décourager} les pirates
+\item Et de les \textbf{ralentir}
+\begin{itemize}
+\item ... au moins jusqu'à la prochaine version du logiciel
+\end{itemize}
+\item Certaines protections commerciales y arrivent très bien (le record est d'un an)
+\end{itemize}
+\end{frame}
+
+\section{Conclusion}
+\subsection{Récapitulatif}
+
+\begin{frame}{Récapitulatif}
+\begin{itemize}
+\item Le reverse engineering logiciel est l'art d'analyser et de modifier des programmes sans en posséder la source
+\item L'objectif de la protection logicielle est de freiner le processus de piratage
+\begin{itemize}
+\item Analyse par désassemblage ou débogage
+\item Modification du binaire pour supprimer les routines anti-copie
+\end{itemize}
+\item Tout logiciel commercial se doit d'être protégé
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{Récapitulatif}
+\begin{itemize}
+\item Développer sois-mêmes une protection, nécessite beaucoup de temps et d'investissement, mais est très enrichissant
+\begin{itemize}
+\item Nous avons vu en cours et en TP les protections les plus simples et les plus répandues: numéro de série, chiffrement, obfuscation, vérifications furtives
+\end{itemize}
+\item Néanmoins, l'utilisation de protections professionnelles est recomandée
+\begin{itemize}
+\item Utilisez toutes les options qu'elle vous offre
+\item N'hésitez pas à vous renseigner sur son efficacité, à chercher des outils, des techniques permettant de le contourner
+\item N'hésitez pas à rajouter d'autres vérifications par vous-même
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Récapitulatif}
+\begin{itemize}
+\item Il est toujours nécessaire d'observer une bonne politique de sécurité
+\begin{itemize}
+\item Evitez de distribuer des versions d'évaluation 100\% fonctionnelles, même protégées
+\item Garder un fichier des clients 
+\item Utilisez les options permettant de calculer le numéro de série à partir d'une variable matérielle (adresse MAC, numéro de série du disque dur ...)?
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\subsection{Le présent/futur}
+\begin{frame}{Protections materielles}
+\begin{itemize}
+\item Le logiciel est distribué avec un périphérique sécurisé
+\begin{itemize}
+\item Dongle USB, carte à puce
+\end{itemize}
+\item Une partie du programme est écrite dans le périphérique sécurisé
+\begin{itemize}
+\item Une partie \textbf{importante} du programme
+\end{itemize}
+\item Le logiciel est alors \textbf{dépendant} du périphérique sécurisé
+\begin{itemize}
+\item Pour chaque version du programme distribué, une seul périphérique sécurisé correspond
+\item Le périphérique sécurisé joue le role de \textbf{license}
+\end{itemize}
+\item Le périphérique sécurisé est :
+\begin{itemize}
+\item difficile à \textbf{cloner}
+\item difficile à \textbf{analyser}/lire
+\item Grâce à des moyens \textbf{physiques}
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Utilisation d'un périphérique sécurisé}
+\begin{figure}[!h]
+\includegraphics[scale=0.4]{f1.png}
+\end{figure}
+\end{frame}
+
+
+\subsection{Le métier de reverse engineer}
+\begin{frame}{Le métier de Reverse Engineer}
+\begin{itemize}
+\item Il consiste à étudier des exécutables de toutes sortes, des protection logicielles, des malwares, des formats etc.
+\item Le reverse engineer développe des outils, des protections et fait de la recherche
+\item Les salaires peuvent varier entre 50 000 euros et 100 000 euros brut par an. Mais une personne faisant seulement du reverse aura en général un salaire moins élevé qu'une personne faisant du reverse , ainsi que de la recherche et du développement
+\item En France, les postes de reverse engineer sont rares et souvent moins bien payé que dans les autres pays
+\end{itemize}
+\end{frame}
+\end{document}

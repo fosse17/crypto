@@ -1,0 +1,756 @@
+\documentclass{beamer}
+\usepackage[french]{babel}
+\mode<presentation>
+\usepackage[latin1]{inputenc}
+\usepackage{color}
+
+\usetheme{Luebeck}
+%\usecolortheme{seahorse}
+\setbeamertemplate{bibliography item}[text]
+\setbeamertemplate{blocks}[rounded][shadow=true]
+
+
+\title[Introduction à la sécurité informatique]{Cryptologie asymétrique}
+\institute{\textbf{Pierre Ramet:} \texttt{ramet@labri.fr}}
+
+
+\author{DUT S4}
+\date{2013-2014}
+
+%\setcounter{tocdepth}{1}
+\begin{document}
+
+\begin{frame}
+
+  \titlepage
+
+\end{frame}
+
+\AtBeginSubsection[]
+                  {
+                    \begin{frame}<beamer>
+                      \frametitle{Plan}
+                      \tableofcontents[currentsection,currentsubsection,sectionstyle=show/shaded,subsectionstyle=show/shaded/hide]
+                    \end{frame}
+                  }
+\begin{frame}<beamer>
+                      \frametitle{Plan}
+                      \tableofcontents
+                    \end{frame}
+                    
+\section{Introduction}
+\subsection{Le principe}
+
+\begin{frame}{La cryptgraphie à clé secrète}
+\begin{figure}[!h]
+\includegraphics[scale=0.2]{secrete.png}
+\end{figure}
+\begin{itemize}
+\item \textbf{Une seule} clé pour chiffrer/déchiffrer
+\item La clé est connue des deux intervenants
+\item Si un attaquant intercepte la clé, fin de la confidentialité 
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Limites de la cryptographie à clé secrète}
+\begin{itemize}
+\item Il faut pouvoir communiquer la clé secrète par un moyen sûr
+\begin{itemize}
+\item Lettre, téléphone, malette diplomatique
+\item Pas très pratique
+\end{itemize}
+\item Nombre de clés à échanger pour communiquer avec plusieurs personnes
+\begin{figure}
+\begin{tabular}{|c|c|}
+\hline
+Nb personnes & Nb clés \\
+\hline
+2 & 1 \\
+\hline
+5 & 10 \\
+\hline
+100 & 4450 \\
+\hline
+$n$ & $n(n-1)$ \\
+\hline
+\end{tabular}
+\end{figure}	
+\item Plutôt contraignant
+\end{itemize}
+\end{frame}
+
+\begin{frame}{La cryptographie à clé publique}
+\begin{itemize}
+\item Petite révolution dans les années 1970 (Diffie Hellman 1976)
+\item La sécurité ne repose désormais plus sur:
+\begin{itemize}
+\item Un secret partagé (la clé secrète)
+\item Des algorithmes obscurs
+\end{itemize}
+\item Mais sur:
+\begin{itemize}
+\item Des problèmes connus de tous (ex: factorisation)
+\item Une information connue de tous (la clé publique)
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{La cryptographie à clé publique}
+\begin{itemize}
+\item La cryptographie à clé publique ou asymétrique est basée sur un
+concept très différent de la cryptographie symétrique
+\item Chaque intervenant possède une \textbf{clé publique}
+\begin{itemize}
+\item Cette clé peut être connue de tous. Par exemple, disponible dans un répertoire accessible
+publiquement, sur internet
+\item Toute personne connaissant cette clé peut envoyer un message chiffré au propriétaire de
+cette clé
+\end{itemize}
+\item Chaque intervenant possède une \textbf{clé privée}
+\begin{itemize}
+\item Cette clé doit demeurer confidentielle
+\item Cette clé est liée (mathématiquement) à la clé publique correspondante
+\item Cette clé permet de déchiffrer tout message chiffré avec la clé publique correspondante
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Le principe du coffre fort}
+On peut assimiler la cryptographie à clé publique au protocole suivant:
+\begin{itemize}
+\item Bob veut envoyer un message à Alice de manière confidentielle 
+\item Alice fournit un coffre fort à Bob, ainsi qu'un cadenas
+\begin{itemize}
+\item Alice conserve la clé du cadenas
+\end{itemize}
+\item Bob met ses documents dans le coffre d'Alice et le cadenasse
+\begin{itemize}
+\item Le cadenas est la \textbf{clé publique} d'Alice
+\item Il permet de mettre des informations dans le coffre
+\item \textbf{Difficile} d'ouvrir le coffre juste avec le cadenas
+\end{itemize}
+\item Alice récupère le coffre, et l'ouvre avec la clé du cadenas
+\begin{itemize}
+\item C'est la \textbf{clé privée} d'Alice
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Exemple}
+\begin{figure}[!h]
+\includegraphics[scale=0.7]{coffre.png}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Exemple plus réaliste}
+Un exemple plus réaliste:
+\begin{itemize}
+\item Bob veut envoyer un message à Alice de manière confidentielle 
+\item Alice possède un couple (clé privée,clé publique)
+\item Bob récupère la clé publique d'Alice (disponible publiquement)
+\begin{figure}[!h]
+\includegraphics[scale=0.5]{cle1.png}
+\end{figure}
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Exemple plus réaliste (2)}
+\begin{itemize}
+\item Bob \textbf{chiffre} son message avec la \textbf{clé publique} d'Alice
+\item Il l'envoie à Alice
+\item Alice déchiffre le message avec sa clé privée
+\begin{figure}[!h]
+\includegraphics[scale=0.5]{cle2.png}
+\end{figure}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Avantages}
+Avantages:
+\begin{itemize}
+\item Si N intervenants veulent s'échanger des informations sans l'aide
+d'un tiers, chaque intervenant doit avoir une clé publique unique
+connue de tous
+\begin{itemize}
+\item Donc, N clés sont suffisantes
+\end{itemize}
+\item Les clés publiques doivent être distribuées de façon authentifiée,
+mais non confidentielle
+\begin{itemize}
+\item Seule la clé publique est divulgée
+\item Connaître la clé publique d'un intervenant \textbf{ ne permet pas de déchiffrer} ses messages
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Comment est-ce possible ?}
+\begin{itemize}
+\item La cryptographie à clé publique est basée sur des problèmes mathématiques
+\item Utilisation de fonction \textbf{à sens unique à brèche secrète}
+\begin{itemize}
+\item Métaphore du cadenas
+\begin{itemize}
+\item Facile à fermer
+\item Nécessite une clé pour ouvrir
+\end{itemize}
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\subsection{Fonctions à sens unique}
+\begin{frame}{Rappel de la complexité}
+Théorie de la complexité:
+\begin{itemize}
+\item On dira qu'un problème est \textbf{complexe} si il appartient à la classe $NP$ (\textit{non-determinist polynomial})
+\begin{itemize}
+\item C'est à dire que trouver une solution au problème se fait en $O(2^{n^k})$
+\item Vérifier la solution se fait en temps polynomial
+\item $n$ étant la longueur de l'entrée (en bits)
+\end{itemize}
+\item On dirat qu'un problème est \textbf{facile} si il existe un algorithme le résolvant appartenant à $P$
+\begin{itemize}
+\item Trouver une solution se fait en $O(n^k)$
+\item Facile ... si $k$ reste petit
+\end{itemize}
+\item Donnez des exemples
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Rappel de la complexité (2)}
+\begin{itemize}
+\item Un ordinateur peut résoudre des problèmes appartenant à la classe $P$
+\begin{itemize}
+\item Dans la plupart des cas, c'est à dire si $k$ pas trop grand
+\item Un ordinateur peut difficilement résoudre des problèmes $NP$-complexes
+\begin{itemize}
+\item Dès que $n$ devient un peu grand, le temps nécessaire devient prohibitif
+\item Exemple: factoriser un nombre de 1024 bits
+\end{itemize}
+\item Conjecture $P \neq NP$ ?
+\begin{itemize}
+\item Pas prouvé !
+\item Mais on l'espère
+\end{itemize}
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Fonction à sens unique}
+\begin{definition}
+Une fonction à sens unique est une fonction $f$ telle que  $f(x)$ est facile à calculer et $f^{-1}(x)$ est difficile à calculer
+\end{definition}
+\begin{itemize}
+\item Exemple: 
+\begin{itemize}
+\item casser un oeuf
+\item mélanger un pot de peinture rouge et un pot de peinture blanche
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Factorisation}
+\begin{itemize}
+\item Quelle est la complexité de factorisation ?
+\item Trouver les deux facteurs premiers de:
+\begin{itemize}
+\item $35=5*7$
+\item $221=13*17$
+\item $50123093$ ?
+\end{itemize}
+\item Comment calculer le dernier exemple ?
+\item Quelle complexité ? 
+\begin{itemize}
+\item ici $n=\mid log_2(50123093) \mid +1=26$
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\subsection{Fonction à sens unique à brêche secrète}
+\begin{frame}{Fonction à sens unique à brêche secrète}
+\begin{definition}
+Une fonction à sens unique et à brèche secrète est une fonction $f$ telle que
+\begin{itemize}
+\item $f(x)$ est facile à calculer
+\item $f^{-1}(x)$ est difficile à calculer
+\item $f^{-1}(x)$ sachant $k$ est facile à calculer
+\begin{itemize}
+\item $k$ est la \textbf{brêche secrête}
+\end{itemize}
+\end{itemize}
+\end{definition}
+\end{frame}
+
+
+
+\begin{frame}{Récapitulatif}
+\begin{itemize}
+\item La cryptographie asymétrique: Chaque utilisateur possède \textbf{deux} clés :
+\begin{itemize}
+\item Une \textbf{clé publique} qui permet de \textbf{chiffrer} des messages pour l'utilisateur
+\item Une \textbf{clé privée} qui permet à l'utilisateur de \textbf{déchiffrer} les messages chiffrés avec sa clé publique
+\end{itemize}
+\item La clé publique est \textbf{diffusée} à tout le monde
+\begin{itemize}
+\item La connaître ne permet pas de déchiffrer les messages 
+\end{itemize}
+\item La clé privée est gardée \textbf{secrète} par l'utilisateur
+\begin{itemize}
+\item La seule qui permette de déchiffrer les messages
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Récapitulatif (2)}
+\begin{itemize}
+\item La cryptographie à clé publique est basée sur des problèmes mathématiques \textbf{difficiles à résoudre}
+\begin{itemize}
+\item Factorisation
+\item Logarithme discret
+\end{itemize}
+\item De ces problèmes, on extrait des \textbf{fonction à sens unique à brêche secrête}
+\begin{itemize}
+\item Calculer $f(x)$ est \textbf{facile} ($f$=clé publique, $x$=message)
+\item Calculer $f^{-1}(x)$ est \textbf{difficile} 
+\item Calculer $f^{-1}(x)$ sachant $k$ est \textbf{facile} ($k$=clé privée)
+\end{itemize}
+\item Les deux problèmes les plus célèbres:
+\begin{itemize}
+\item Le problème \textbf{RSA}
+\item Le problème \textbf{Diffie Hellman}
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\section{Le cryptosystème RSA}
+\subsection{Rappels d'arithmétique modulaire}
+
+\begin{frame}{Calcul modulaire}
+\begin{itemize}
+\item $37 \equiv 2~mod~5$:
+\begin{itemize}
+\item $37=2+k*5$
+\item Reste de la division Euclidienne
+\end{itemize}
+\item Addition, multiplication, exponentiation modulaire
+\begin{itemize}
+\item Opérations peu coûteuses
+\end{itemize}
+\item $Z_n$= ensemble des résidus modulo $n$ muni des opérations modulaires
+\item Inversion modulaire:
+\begin{itemize}
+\item Trouver $b$ tel que $ab \equiv 1~mod~n$
+\begin{itemize}
+\item Si $pgcd(a,n)=1$, une solution unique (algorithme d'Euclide étendu)
+\item Sinon pas de solution
+\end{itemize}
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Calcul modulaire (2)}
+\begin{itemize}
+\item Petit théorème de Fermat:
+\begin{theorem}
+Si $m$ premier, et $pgcd(a,m) = 1$, $a^{m-1} \equiv 1~mod~m$
+\end{theorem}
+\item Fonction d'Euler :
+\begin{definition}
+\begin{itemize}
+\item $\varphi(n)$ est le nombre de résidus premiers avec $n$
+\item Si $n$ est premier, $\varphi(n) = n-1$
+\item Si $n=p*q$, alors $\varphi(n) = (p-1)(q-1)$
+\end{itemize}
+\end{definition}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Calcul modulaire (3)}
+\begin{itemize}
+\item Petit théorème de Fermat généralisé par Euler :
+\begin{theorem}
+Si $pgcd(a,n) = 1$, $a^{\varphi(n)} \equiv 1~mod~n$
+\end{theorem}
+\item Inverse modulaire :
+\begin{theorem}
+Si $pgcd(a,n) = 1$, l'inverse de $a$ est $a^{\varphi(n)-1}~mod~n$
+\end{theorem}
+\end{itemize}
+\end{frame}
+
+\subsection{Le problème RSA}
+\begin{frame}{Quelques exemples}
+Deux principales fonction à sens unique et à brêche secrète en cryptographie asymétrique:
+\begin{itemize}
+\item Basé sur le problème \texttt{factorisation}:
+\begin{itemize}
+\item Le problème \textbf{RSA}
+\end{itemize}
+\item Basé sur le problème \texttt{logarithme discret}
+\begin{itemize}
+\item Le problème \textbf{Diffie Hellman}
+\end{itemize}
+\item Abordons tout d'abord RSA
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Le problème RSA}
+\begin{itemize}
+\item Le problème \textbf{factorisation}:
+\begin{itemize}
+\item Entrée: $n=p*q$ produit de deux nombres premiers
+\item Sortie: $p$ et $q$
+\end{itemize}
+\item Fournit une fonction à sens unique, mais pas de brêche secrète
+\item Le problème \texttt{RacineIemeModulaire} ou problème \textbf{RSA}:
+\begin{itemize}
+\item Entrées:
+\begin{itemize}
+\item Un entier $n= p*q$ produit de deux nombres premiers
+\item Un entier $e>0$ premier avec $(p-1)*(q-1)$
+\item Un entier $c$
+\end{itemize}
+\item Sortie: $m$ tel que $c=m^e~mod n$
+\end{itemize}
+\item Fonction à sens unique et à brêche secrète $(p,q)$
+\item le cryptosystème RSA est basé sur les problèmes \texttt{RacineIemeModulaire} \textbf{et} \texttt{factorisation}
+\end{itemize}
+\end{frame}
+
+
+\subsection{Le cryptosystème RSA}
+\begin{frame}{RSA}
+\begin{itemize}
+\item Chiffrement à clé publique le plus utilisé
+\item Créé en 1977 par Rivest, Shamir et Adleman
+\item Breveté par le MIT en 1983 aux États-Unis. Le brevet a expiré le 21 septembre 2000
+\item Utilisé dans :
+\begin{itemize}
+\item Les banques
+\item Les cartes à puce
+\item Les site webs commerciaux
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Protocole}
+Trois étapes:
+\begin{enumerate}
+\item Création d'une clé publique et d'une clé privée pour Bob
+(la clé publique est diffusée à tout le monde, par exemple à
+Alice)
+\item A chaque fois qu'Alice veut envoyer un message
+confidentiel à Bob, elle utilise la clé publique de Bob pour
+chiffrer le message
+\item Bob utilise sa clé privée pour déchiffrer le message
+envoyé par Alice
+\end{enumerate}
+\end{frame}
+
+\begin{frame}{Création des clés}
+\begin{enumerate}
+\item Choisir deux grand nombres $p$ et $q$ premiers 
+\item $n=p*q$ et $\varphi(n)=(p-1)(q-1)$ 
+\item $e$ un entier tel que $1<e<\varphi(n)$ et $e$ premier avec $\varphi(n)$
+\begin{itemize}
+\item i.e $pgcd(e,\varphi(n))=1$
+\end{itemize}
+\item Calculer $d$ tel que $ed=1~mod~\varphi(n)$
+\item \textbf{Clé publique}: $(e,n)$
+\item \textbf{Clé privée}: $d$ (ou $(p,q)$)
+\end{enumerate}
+\end{frame}
+
+
+\begin{frame}{Chiffrement}
+\begin{enumerate}
+\item Obtenir la clé publique $(e,n)$ du destinataire
+\item Représenter le message comme un entier $m$ tel que $1<m<n$
+\item Calculer $c=m^e~mod~n$: texte chiffré
+\begin{itemize}
+\item Relation avec le problème \texttt{RSA} ?
+\end{itemize}
+\end{enumerate}
+\end{frame}
+
+\begin{frame}{Déchiffrement}
+\begin{enumerate}
+\item  A l'aide de la clé privée $d$, calculer: 
+$$m=c^d~mod~n$$
+\item Et c'est tout !
+\end{enumerate}
+\end{frame}
+
+\begin{frame}{Exemple}
+\begin{itemize}
+\item $p=31$ et $q=137$
+\item $n=4247$ et $\varphi(n)=4080$
+\item $e=967$ ($1<e<\varphi(n)$ et $pgcd(e,\varphi(n))=1$)
+\item $d=2983$ ($1<d<\varphi(n)$ et $ed =707x4080+1 = 1~mod~\varphi(n)$)
+\item Clé publique: $(e,n)$
+\item Clé privée: $d$
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Exemple Chiffrement/Déchiffrement}
+\begin{itemize}
+\item Message en clair $m=3333$
+\item Chiffrement: 
+$$c=m^e~mod~n=3333^{967}~mod~4247=3790$$
+\item Déchiffrement:
+$$m=c^d~mod~n=3790^{2983}~mod~4247=3333$$
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Preuve formelle}
+\begin{enumerate}
+\item  On rappelle: 
+$$m=c^d~mod~n$$
+\item Exercice:
+\begin{itemize}
+\item Démontrez que $c^d~mod~n$ permet bien de retrouver le message en clair. On s'aidera de:
+\begin{itemize}
+\item Des propriétés de l'arithmétique modulaire
+\item Du petit théorème de Fermat
+\end{itemize}
+\end{itemize}
+\end{enumerate}
+\end{frame}
+
+
+\subsection{Sécurité}
+\begin{frame}{RSA pourquoi ça marche ?}
+\begin{itemize}
+\item Attaque à texte chiffré: revient à résoudre le problème \texttt{RSA} qui est \textbf{difficile} 
+\begin{itemize}
+\item C'est à dire difficile de calculer la solution de manière efficace 
+\item Problème supposé dans NP
+\item S'assurer quand même que $n$ est grand
+\end{itemize}
+\item Retrouver la clé privée à partir de la clé publique: revient à résoudre le problème \texttt{factorisation} qui est \textbf{difficile}
+\begin{itemize}
+\item Opération mathématiquement impossible si $n$ est grand
+\item Et heureusement RSA utilise de grand nombres (plus de 1024bits conseillé)
+\item Record actuel: 512bits (Anciennes cartes à puces: 320bits!)
+\item Combien de temps cela prendrait-il pour un ordinateur à 4Ghz si $n$ fait 1024 bits ?
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Confiance dans RSA}
+\begin{itemize}
+\item Utilisé depuis 25 ans
+\begin{itemize}
+\item Quelques défauts mineurs ont été corrigés
+\end{itemize}
+\item \textbf{La confiance dans la sécurité de RSA est
+calculatoire} : difficulté de factoriser un
+grand nombre en facteurs premiers
+\item Mais il n'existe pas de démonstration que
+RSA ne puisse pas être un jour pris en
+défaut 
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Inconvénients}
+\begin{itemize}
+\item RSA est très lent 
+\begin{itemize}
+\item 1000 fois plus que DES
+\item Clé de grande taille
+\end{itemize}
+\item Souvent RSA+chiffrement symétrique:
+\begin{enumerate}
+\item D'abord l'expéditeur d'un message choisit une clé secrète
+symétrique
+\item Il chiffre son message avec cette clé secrète
+\item Il envoie au destinataire ce message chiffré et ainsi que la
+clé secrète chiffrée avec la clé publique du destinataire
+\item Le destinataire déchiffre avec sa clé privée la clé secrète
+chiffrée
+\item Avec le clé secrète déchiffrée, il déchiffre le message
+\end{enumerate}
+\end{itemize}
+\end{frame}
+
+
+\section{Diffie Hellman}
+\subsection{Le problème Diffie-Hellman}
+\begin{frame}{Le problème Diffie Hellman}
+\begin{itemize}
+\item Le problème \textbf{Logarithme Discret}:
+\begin{itemize}
+\item Entrée: un entier premier $p$, un générateur $g$ de $Z_p^*$ et $y \in Z_p^*$
+\item Sortie: en entier $e$ tel que $g^e~mod~p=y$
+\end{itemize}
+\item Fournit une fonction à sens unique, mais pas de brêche secrète
+\item Le problème \textbf{Diffie Hellman}:
+\begin{itemize}
+\item Entrées:
+\begin{itemize}
+\item Un entier premier $p$
+\item Un générateur $g$ de $Z_p^*$
+\item Deux entiers $g^a~mod~p$ et $g^b~mod~p$
+\end{itemize}
+\item Sortie: l'entier $g^{ab}~mod~p$
+\end{itemize}
+\item Fonction à sens unique et à brêche secrète $(a,b)$
+\item Le cryptosystème Diffie-Hellman est basé sur les problèmes \texttt{Logarithme Discret} \textbf{et} \texttt{Diffie Hellman}
+\end{itemize}
+\end{frame}
+
+\subsection{Le cryptosystème  Diffie Hellman}
+\begin{frame}{Diffie Hellman}
+\begin{itemize}
+\item Pas un protocole de chiffrement, mais un protocole d'\textbf{échange de clé}
+\item Basé sur les problèmes \textbf{Logarithme Discret} et \textbf{Diffie Hellman}
+\item Objectif:
+\begin{itemize}
+\item Alice et Bob veulent s'échanger une information connue d'eux seuls
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Protocole}
+\begin{enumerate}
+\item Soit $p$ un grand nombre premier et $g$ un générateur de $Z_p^*$
+\item Alice et Bob se mettent d'accord sur $p$ et $g$
+\item Alice choisit un entier $a$ et calcule $g^a~mod~p$
+\item Alice envoie $g^a~mod~p$ à Bob
+\item Bob choisit un entier $b$ et calcule $g^b~mod~p$
+\item Bob envoie $g^b~mod~p$ à Alice
+\end{enumerate}
+\end{frame}
+
+\begin{frame}{Protocole (2)}
+\begin{itemize}
+\item Alice calcule $(g^b~mod~p)^a mod p=g^{ab}~mod~p$
+\item Bob calcule $(g^a~mod~p)^b mod p=g^{ab}~mod~p$
+\item La clé échangée est :
+$$k=g^{ab}~mod~p$$
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Diffie Hellman}
+\begin{figure}[!h]
+\includegraphics[scale=0.6]{dh.png}
+\end{figure}
+\end{frame}
+
+\subsection{Sécurité}
+\begin{frame}{Diffie Hellman: Pourquoi ça marche ?}
+\begin{itemize}
+\item Un attaquant peut observer $p$, $g$, $g^b~mod~p$ et $g^a~mod~p$
+\item Pour déterminer $k$ il peut:
+\begin{itemize}
+\item Essayer de déterminer $a$ ou $b$ 
+\begin{itemize}
+\item Problème du Logarithme Discret $\Rightarrow$ \textbf{difficle}
+\end{itemize}
+\item Essayer de déterminer directement $g^{ab}~mod~p$
+\begin{itemize}
+\item Problème dit de Diffie Hellman $\Rightarrow$ \textbf{difficle}
+\end{itemize}
+\end{itemize}
+\item L'algorithme \textbf{El Gamal} est basé sur les mêmes problèmes
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Inconvénients}
+\begin{itemize}
+\item Comme RSA, très lent
+\begin{itemize}
+\item Diffie-Hellman+chiffrement symétrique
+\end{itemize}
+\item Pas d'authentification
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Récapitulatif}
+Récapitulatif:
+\begin{itemize}
+\item Le protocole RSA:
+\begin{itemize}
+\item Protocole de \textbf{chiffrement}
+\item Le plus utilisé
+\item Repose sur \textbf{factorisation} et \textbf{RacineIemeModulaire} (difficiles)
+\end{itemize}
+\item Le protocole Diffie Hellman:
+\begin{itemize}
+\item Protocole d'\textbf{échange de clés}
+\item Repose sur le problème \texttt{Logarithme Discret} (difficile)
+\end{itemize}
+\item Bien d'autres protocoles
+\begin{itemize}
+\item El Gamal
+\item Courbes Elliptiques
+\item etc
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+
+
+
+\begin{frame}{Où est utilisée la cryptographie asymétrique ?}
+Partout !
+\begin{itemize}
+\item IPSEC
+\begin{itemize}
+\item Authentification du serveur plus échange de clés: Signature RSA, DSA ..
+\item Chiffrement de la communication (AES, TDES, DES ...)
+\end{itemize}
+\item SSL/TLS
+\begin{itemize}
+\item Authentification du serveur plus échange de clés: RSA + DH 
+\item Chiffrement de la communication (AES, TDES, DES ...)
+\end{itemize}
+\item SSH
+\begin{itemize}
+\item Authentification du serveur plus échange de clés: DH
+\item Authentification du client (facultatif)
+\item Chiffrement de la communication (AES, TDES, DES ...)
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Où est utilisée la cryptographie asymétrique ?}
+\begin{itemize}
+\item Client mail
+\begin{itemize}
+\item PGP, Outlook
+\item Signature des mails: RSA, DSA
+\item Chiffrement des mails RSA + AES, TDES, DES ...
+\end{itemize}
+\item Essayez !
+\begin{itemize}
+\item GPG: GNU Privacy Guard 
+\item Plugin Thunderbird: Enigmail
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Conclusion}
+\begin{itemize}
+\item La cryptographie est un outil essentiel de la politique de sécurité de l'entreprise
+\begin{itemize}
+\item \textbf{Confidentialité}
+\item \textbf{Intégrité}
+\item \textbf{Authenticité}
+\end{itemize}
+\item Cryptographie à clé secrète
+\begin{itemize}
+\item Rapide, mais comment s'échanger la clé
+\end{itemize}
+\item Cryptographie à clé publique
+\begin{itemize}
+\item Plus lente, mais plus pratique
+\item Permet notamment d'authentifier grâce aux \textbf{signatures}
+\end{itemize}
+\end{itemize}
+\end{frame}
+\end{document}

@@ -1,0 +1,92 @@
+\documentclass{beamer}
+\usepackage[french]{babel}
+\mode<presentation>
+\usepackage[latin1]{inputenc}
+
+\usetheme{Luebeck}
+%\usecolortheme{seahorse}
+\setbeamertemplate{bibliography item}[text]
+\setbeamertemplate{blocks}[rounded][shadow=true]
+
+
+\title[Introduction à la sécurité informatique]{Introduction à la sécurité informatique}
+\institute{\textbf{Pierre Ramet:} \texttt{ramet@labri.fr}}
+
+
+\author{DUT S4}
+\date{2013-2014}
+
+%\setcounter{tocdepth}{1}
+\begin{document}
+
+\begin{frame}
+
+  \titlepage
+
+\end{frame}
+
+\AtBeginSubsection[]
+                  {
+                    \begin{frame}<beamer>
+                      \frametitle{Plan}
+                      \tableofcontents[currentsection,currentsubsection,sectionstyle=show/shaded,subsectionstyle=show/shaded/hide]
+                    \end{frame}
+                  }
+                  
+
+\begin{frame}{Organisation}
+Organisation du module:
+\begin{itemize}
+\item Module sécurité (16h) : 4x4h
+% \begin{itemize}
+% \item Le 03/12/08 de 8h à 12h
+% \item Le 10/12/08 de 8h à 12h 
+% \item Le 17/12/08 de 8h à 12h
+% \item Le ??/01/09 de 8h à 12h
+% \end{itemize}
+\item 8-10h de cours
+\item 6-8h de TP
+\item Un partiel de 1h
+\end{itemize}
+\begin{block}{Contact}
+%Support de cours: \texttt{www.labri.fr/$\sim$tabary}\\
+Pour toute question: \texttt{ramet@labri.fr}
+\end{block}
+\end{frame}
+
+\begin{frame}{Objectifs}
+Objectifs du cours:
+\begin{itemize}
+\item Aperçu \textit{rapide} de la sécurité informatique 
+\item Principales problématiques de la sécurité informatique
+\item Avoir quelques bases pour comprendre des argumentaires techniques et les discours
+commerciaux relatifs 
+\item Se former (et former les autres) aux bons usages
+\end{itemize}
+\end{frame}      
+
+\begin{frame}{Découpage des cours}
+4 parties:
+\begin{itemize}
+\item La politque de sécurité dans l'entreprise
+\item Cryptologie
+\begin{itemize}
+\item Chiffrement symétrique
+\item Chiffrement asymétrique
+\item Signature et certification
+\end{itemize}
+\item Sécurité logicielle
+\begin{itemize}
+\item Le reverse engineering
+\item Les failles logicielles et leur exploitation
+\item Logiciels malveillants et contre-mesures
+\end{itemize}
+\item Sécurité réseau (?)
+\begin{itemize}
+\item Vulnérabilités des protocoles
+\item Quelques attaques célèbres
+\item Détection et prévention
+\end{itemize}
+\end{itemize}
+\end{frame}            
+\end{document}

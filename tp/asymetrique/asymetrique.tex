@@ -1,0 +1,162 @@
+\documentclass[a4paper]{article}
+
+
+\usepackage[latin1]{inputenc} % LaTeX, comprends les accents !
+\usepackage[T1]{fontenc} % Police contenant les caractères français
+\usepackage{geometry} % Définir les marges
+\usepackage[french,english]{babel}
+\usepackage{graphicx}
+\usepackage{url}
+
+%\pagestyle{fancyheaders}
+\title{\textbf{Cryptographie asymétrique: RSA, Diffie-Hellman}}
+\author{Cours de sécurité: DUT S4}
+\date{2013-2014}
+\begin{document}
+
+
+\maketitle
+
+\section{RSA}
+
+\paragraph{Rappel RSA au tableau}
+
+\subsection{Codage et décodage RSA}
+On considère la clef publique RSA (11, 319), c'est-à-dire pour $n = 319$ et $e = 11$. \textbf{On donne $p=11$ et $q=29$}.
+\begin{enumerate}
+\item Calculez le chiffré du message $m=100$
+\item Le message $m=635$ peut-il résulter d'un codage avec la clé publique ? Pourquoi ?
+\item Calculez la fonction indicatrice d'Euler $\varphi(n)$
+\item Calculez la clé privée $d$, telle que $ed=1~mod~\varphi(n)$. Un peu d'aide :
+\begin{enumerate}
+\item Les coefficients de bezout de deux entiers $a$ et $b$ sont les entiers $x$ et $y$ tels que:
+$$x*a+b*y=pgcd(a,b)$$
+On suppose que l'on possède une fonction $bezout(a,b)$ qui renvoit pour tout couple $(a,b)$ les coefficients de bezout $(x,y)$ associés. Sachant que $e$ et $n$ sont premiers entre eux (i.e $pgcd(e,\varphi(n))=1$), montrer comment obtenir $d$ à partir de $e$ et $\varphi(n)$ 
+\item Le calcul des coefficient de bezout peut se faire à l'aide de l'algorithme d'Euclide étendu.
+\begin{itemize}
+\item Description de l'algorithme: \\http://fr.wikipedia.org/wiki/Algorithme\_d\%27Euclide\_\%C3\%A9tendu
+\item Une version de l'algorithme facile à faire tourner à la main :\\ http://marauder.millersville.edu/$\sim$bikenaga/absalg/exteuc/exteucex.html
+\end{itemize}
+\end{enumerate}
+\item Déchiffrez le message $m'=133$
+\end{enumerate}
+
+\subsection{Attaques sur l'implémentation}
+
+\subsubsection{Algorithme de Naggle}
+Alice et Bob communiquent en utilisant RSA. Leur clé
+publique est incassable (1024 bits). La liaison entre la machine d'Alice et celle de Bob est très
+rapide, si bien que les caractères saisis au clavier par Alice sont envoyés un par un à Bob.
+\begin{enumerate}
+\item Comment Oscar peut-il déchiffrer les messages d'Alice ?
+\item Comment résoudre ce problème ?
+\item L'amélioration du protocole que vous avez proposée permet-elle d'empêcher Oscar de
+distinguer deux messages identiques d'Alice ? Permet-elle d'empêcher Oscar de ré-envoyer
+plus tard un message qu'il aura intercepté (sans pouvoir le comprendre) ?
+\end{enumerate}
+
+\subsubsection{Nombres $p$ et $q$ proches}
+Un programmeur Toto décide de dévier du protocole RSA en choisissant non pas deux grands nombres premiers $p$ et $q$ \textbf{aléatoires} mais deux grands nombres premiers $p$ et $q$ \textbf{très proches}, avec $p>q$. Ce nouveau protocole sera appelé \texttt{RSAnaze}.
+\begin{enumerate}
+\item En posant $n=p*q$, $s=\frac{p-q}{2}$ et $t=\frac{p+q}{2}$, démontrez que $n=t^2-s^2$
+\begin{enumerate}
+\item Que peut ont dire de $s$ (et donc de $s^2$) ?
+\item En déduire une approximation de $t$
+\end{enumerate}
+\item Déduire de la question précédente une attaque de \texttt{RSAnaze}. On précisera:
+\begin{enumerate}
+\item Le problème résolu
+\item L'algorithme le resolvant
+\end{enumerate}
+\end{enumerate}
+
+\subsection{Attaque par modulo commun}
+Alice envoie le même message clair $m$ (chiffré via RSA) à Bob et Bart. Tous deux utilisent le même modulo $n$ et des exposants publics $e_1$ et $e_2$ qui sont premiers entre-eux. Alice publie donc vers Bob et Bart respectivement $m_1 = m^{e_1}$ $mod$ $n$ et $m_2 = m^{e_2}$ $mod$ $n$.
+
+\begin{enumerate}
+\item Montrer que si $u_1$ et $u_2$ sont tels que $u_1*e_1 + u_2*e_2 = 1$ alors $m = (m_1^{u_1}~mod~n)*m_2^{u_2}~mod~n$.
+\item Comment trouver $u_1$ et $u_2$ ?
+\item Implémentez l'attaque pour $n=473$, $e_1=17$, $e_2=5$ $m_1=381$ et $m_2=252$. Aide:
+\begin{itemize}
+\item On a forcément $u_1$ ou $u_2$ négatif, cela risque de poser problème. Pourquoi ?
+\item On pose $u_1$ négatif. Montrez que $m_{1}^{u_1}=(m_{1}^{-1})^{\mid u_1 \mid}$
+\item A l'aide des résultats précédents, montrez que  $m = (m_1^{-1}~ mod~ n)^{\mid u_1 \mid}*m_2^{u_2}~mod~n$
+\item Calculez $m_{1}^{-1}~mod~n$ (Aide: coefficients de bezout)
+\item A l'aide des résultats précédents, retrouvez $m$, le message en clair original
+\end{itemize}
+\end{enumerate}
+
+\section{Diffie Hellman}
+On rappelle tout d'abord le problème \texttt{LogarithmeDiscret}:
+\begin{itemize}
+\item Entrées: 
+\begin{itemize}
+\item $p$ un nombre premier
+\item $\alpha$ en générateur de $Z_{p}^*$ (c'est à dire un entier t.q $\{a^i~mod p~\mid~i>0\}= Z_{p}^*$)
+\item un entier $x \in  Z_{p}^*$
+\end{itemize} 
+\item Sortie:
+\begin{itemize}
+\item $b$ t.q $\alpha^b=x$
+\end{itemize}
+\end{itemize}
+
+\subsection{Echange de clés}
+\begin{enumerate}
+\item Rappelez le protocole d'échange de clé de \texttt{Diffie Hellman}. Sur quels problèmes (difficiles) est-il basé ?
+\item Soit $k$ la clé échangée entre Alice et Bob via \texttt{Diffie Hellman}. Démontrez que connaître $k$ est aussi facile que 
+\begin{itemize}
+\item le problème \texttt{LogarithmeDiscret}
+\item le problème \texttt{DiffieHellman}
+\end{itemize}
+\item Imaginons que la communication entre Alice et Bob ne soit pas sûre, i.e Oscar peut détourner le canal de communication entre eux deux
+\begin{enumerate}
+\item Comment peut faire Oscar pour écouter en clair les converstions entre Alice et Bob ?
+\item Quelle propriété manque dans l'algorithme d'échange de clés de \texttt{Diffie Hellman} ?
+\end{enumerate}
+\item On suppose que chaque participant possède un couple de clés publique et privée. Proposez un nouvel algorithme qui ne souffre pas de ce défaut (plusieurs solutions possibles). Vous préciserez notamment la génération des clés.
+\end{enumerate}
+
+\subsection{Cryptosystème basé sur Diffie Hellman}
+\begin{enumerate}
+\item Bob veut envoyer un message chiffré à Alice. Proposez un cryptosystème à clé publique s'insiprant du problème \texttt{Diffie Hellman} (et donc forcément de \texttt{LogarithmeDiscret}).
+\begin{enumerate}
+\item Quelle est la clé publique de Bob ? Quelle est sa clé privée ?
+\item Quels sont les échanges entre Alice et Bob ?
+\end{enumerate}
+\end{enumerate}
+
+\section{Mise en pratique}
+Nous allons maintenant \textbf{utiliser} le chiffrement et la signature asymétrique, à travers l'envoi de mails chiffrés et signés.
+Pour ce faire, nous allons utiliser (sous windows, mais la manip est identique sous linux) le client OpenPGP ainsi que le plugin
+Thunderbird EnigMail.
+\subsection{Installation}
+\begin{enumerate}
+\item Démarrez sous windows et installez le plugin Thunderbird Enigmail.
+\item Téléchargez le client windows GPG à l'adresse \url{ftp://ftp.gnupg.org/gcrypt/binary/gnupg-w32cli-1.4.0a.zip}. NB: ce n'est pas la dernière version,
+mais elle est "installable" sans les privilèges administrateur. Si vous voulez l'installer chez vous, utilisez plutôt la dernière version.
+\item Dezippez l'archive dans \url{Z:\gpg}
+\item Sous Thunderbird, \texttt{OpenPGP->Préférences}: 
+\begin{itemize}
+\item cochez "mode expert"
+\item cochez "outrepasser avec" et selectionner l'exécutable \url{z:\gpg\gpg.exe}
+\item dans l'onglet "avancé", ajoutez dans "Parametres supplémentaires pour GnuPG" la ligne:
+\begin{verbatim}
+--homedir z:\gpg
+\end{verbatim}
+\end{itemize}
+\end{enumerate}
+\subsection{Utilisation}
+Organisez-vous en groupe de 3 élèves (A,B et C). Chaque élève doit avoir effectué l'installation.
+\begin{enumerate}
+\item Générez-vous un couple clé privée/clé publique.
+\begin{itemize}
+\item A votre avis, à quoi sert la phrase secrète ?
+\item Exportez ces clés vers un fichier .asc et regardez rapidement leur format
+\end{itemize}
+\item Echangez-vous vos clés publiques par mail (OpenPGP->Attacher ma clé publique)
+\item Vérifiez que si A envoie un message chiffré à B, C ne peut pas le déchiffrer
+\item Vérifiez que si A envoie un message signé en se faisant passer pour B, C le découvrira
+\item Bonus $0,5$ points: envoyez-moi un message chiffré (ma clé publique est disponible sur \url{www.labri.fr/~ramet})
+\end{enumerate}
+\end{document}

@@ -1,0 +1,6 @@
+cesar1: cle = e anticle = w
+vigenere1: taille_cle=7 cle=bonjour anticle=zmnrmgj
+
+BCDEFGHIJKLMNOPQRSTUVWXYZA
+ZYXWVUTSRQPONMLKJIHGFEDCBA
+

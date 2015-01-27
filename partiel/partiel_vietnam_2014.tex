@@ -1,0 +1,397 @@
+\documentclass[a4paper]{article}
+
+
+\usepackage[latin1]{inputenc} % LaTeX, comprends les accents !
+\usepackage[T1]{fontenc} % Police contenant les caractères français
+\usepackage{geometry} % Définir les marges
+\usepackage[french,english]{babel}
+\usepackage{graphicx}
+\usepackage{fancyhdr}
+\usepackage{amsfonts}
+
+\usepackage{ntheorem}
+%\theoremstyle{changebreak}
+\setlength\theorempreskipamount{\baselineskip}
+\setlength\theorempostskipamount{6pt}
+\theorembodyfont{\upshape}
+\theoremheaderfont{\bfseries}
+%\theoremseparator{:} 
+
+\pagestyle{fancyplain}
+\lhead{\fancyplain{I.U.T Informatique de Bordeaux 1}{I.U.T Informatique de Bordeaux 1}}
+\rhead{\fancyplain{PUF Vietnam 2013/2014}{PUF Vietnam 2013/2014}}
+
+\newtheorem{q}{\textbf{\textsc{Question}}}
+
+\title{\textbf{Introduction à la sécurité informatique} }
+\author{Examen - sans document}
+%\date{Durée: 1 heure}
+\date{Durée: 1 heure 30}
+\begin{document}
+\maketitle
+
+L'énoncé comporte de nombreuses questions, pensez à gérer votre temps. Attention, pour les questions type QCM, une mauvaise réponse \textbf{enlève des points}: si vous ne savez pas, ne répondez pas. Pour certaines questions, plusieurs réponses peuvent être justes.
+Bon courage !
+
+\textbf{Répondez directement sur cette feuille.}
+
+\textbf{NOM~:}\hspace{5cm}\textbf{PRENOM~:}
+
+% \section*{Politique de sécurité}
+% \begin{q} 
+% Quels sont les trois principaux objectifs de la sécurité informatique ?
+% \vspace{0.2cm}
+% \begin{enumerate}
+% \item \underline{\textbf{C}~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+% \item \underline{\textbf{I}~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+% \item \underline{\textbf{D}~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+% \end{enumerate}
+% \end{q}
+
+% \begin{q} 
+% En quelques mots, définissez ce qu'est une politique de sécurité. Bonus: donnez le nom d'une méthode utilisée pour la définition d'une politique de sécurité.
+% \begin{itemize}
+% \item[] \underline{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+% \item[] \underline{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+% \item[] \underline{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+% \end{itemize}
+% \end{q}
+
+% \begin{q}
+% Quel est le meilleur outil pour assurer la sécurité dans l'entreprise ?
+% \begin{itemize}
+% \item[$\Box$] un système de détection d'intrusion
+% \item[$\Box$] PowerPoint
+% \item[$\Box$] un antivirus
+% \item[$\Box$] un firewall
+% \end{itemize}
+% \end{q}
+
+
+\section*{Cryptologie}
+
+\subsection*{Concepts généraux}
+
+\begin{q}
+L'art de déchiffrer des messages sans connaître la clé de chiffrement est appelé:
+\begin{itemize}
+\item[$\Box$] La cryptographie
+\item[$\Box$] La cryptologie
+\item[$\Box$] La cryptanalyse
+\end{itemize}
+\end{q}
+
+\begin{q}
+Un algorithme de chiffrement qui possède une bonne propriété de \textit{diffusion} est tel que:
+\begin{itemize}
+\item[$\Box$] le chiffrement du message s'effectue rapidement
+\item[$\Box$] une petite modification du message en clair se traduit par une modification complète du chiffré
+\item[$\Box$] aucune propriété statistique ne peut être déduite du message chiffré
+\end{itemize}
+\end{q}
+
+\begin{q}
+Oscar a réussi à intercepter un couple (message chiffré, message en clair correspondant). A l'aide de ce couple, il a réussi à déterminer la clé $k$ utilisée entre Alice et Bob. C'est une attaque de type:
+\begin{itemize}
+\item[$\Box$] Attaque à texte chiffré
+\item[$\Box$] Attaque à texte clair connu
+\item[$\Box$] Attaque à texte clair choisi
+\end{itemize}
+Le résultat de l'attaque est un:
+\begin{itemize}
+\item[$\Box$] Cassage partiel
+\item[$\Box$] Cassage local
+\item[$\Box$] Cassage complet
+\end{itemize}
+\end{q}
+
+\subsection*{Chiffrements symétriques}
+\begin{q}
+Le chiffrement de César est :
+\begin{itemize}
+\item[$\Box$] une substitution polyalphabétique
+\item[$\Box$] une substitution monoalphabétique
+\item[$\Box$] un chiffrement par bloc
+\end{itemize}
+\end{q}
+
+\begin{q}
+Un message $m$ (en français) chiffré avec l'algorithme de César a été intercepté par Oscar. Les plus fortes fréquences des lettres de ce messages sont les suivantes:\\
+
+\begin{tabular}{|c|c|}
+\hline
+\textbf{Lettre} & \textbf{Fréquence dans le message chiffré} \\
+\hline
+J & 15\% \\
+\hline
+F & 8\% \\
+\hline
+N & 7,5\% \\
+\hline
+X & 7\% \\
+\hline
+Autres lettres & $<$7\% \\
+\hline
+\end{tabular}
+~\\
+
+A l'aide de cette information, retrouvez \textbf{la clé} utilisée pour chiffrer $m$ (Rappel: la lettre la plus fréquente en moyenne dans un texte français est le \texttt{e}).
+
+\begin{itemize}
+\item  \underline{~~~~~~~~~~~}
+\end{itemize}
+\end{q}
+
+
+\begin{q}
+Oscar a intercepté un message chiffré avec l'algorithme de Vigenere. Il a calculé l'indice de coïncidence de ce message (qui est en français) et a obtenu:\\
+
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+ & i=1 & i=2 & i=3 & i=4 & i=5   \\
+\hline
+l=1 & 0,045 &  &  &  &    \\
+\hline
+l=2 & 0,046 & 0,041 &  &  &    \\
+\hline
+l=3 & 0,083 & 0,075 & 0,081 &  &    \\
+\hline
+l=4 & 0,042 & 0,039 & 0,076 & 0,039 &    \\
+\hline
+l=5 & 0,043 & 0,058 & 0,049 & 0,031 & 0,052   \\
+\hline
+\end{tabular}
+~\\
+
+Que peut-il déduire de ces résultats ?
+\begin{itemize}
+\item  \underline{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+\end{itemize}
+
+Quelle autre méthode aurait-il pu utiliser pour obtenir cette information ?
+\begin{itemize}
+\item  \underline{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+\end{itemize}
+\end{q}
+
+% \begin{q}
+% Le principal défaut de l'algorithme de chiffrement \textit{One-Time Pad} est:
+% \begin{itemize}
+% \item[$\Box$] Il est très facile à casser
+% \item[$\Box$] Il est peu pratique à utiliser
+% \item[$\Box$] Il est lent
+% \end{itemize}
+% \end{q}
+
+\begin{q}
+Les chiffrements alphabétiques sont désormais moins utilisés que les chiffrements par bloc.
+\begin{itemize}
+\item[$\Box$] Vrai
+\item[$\Box$] Faux
+\item[$\Box$] Les deux sont autant utilisés
+\end{itemize}
+\end{q}
+
+\newpage
+
+\begin{q}
+Quel est le mode de chiffrement par bloc qui possède la plus mauvaise propriété de diffusion ?
+\begin{itemize}
+\item[$\Box$] le mode ECB
+\item[$\Box$] le mode CTR
+\item[$\Box$] le mode CBC
+\end{itemize}
+\end{q}
+
+\begin{q}
+Le principal défaut de DES était:
+\begin{itemize}
+\item[$\Box$] Sa lenteur
+\item[$\Box$] La petite taille de la clé
+\item[$\Box$] La complexité de l'algorithme
+\end{itemize}
+\end{q}
+
+\begin{q}
+Après l'abandon de DES, un nouveau standard Américain a été choisi. L'algorithme qui a remplacé DES est:
+\begin{itemize}
+\item[$\Box$] TDES
+\item[$\Box$] Blowfish
+\item[$\Box$] AES
+\end{itemize}
+\end{q}
+
+\subsection*{Chiffrements asymétriques}
+\begin{q}
+L'avantage des chiffrements asymétriques par rapport aux chiffrements symétriques est que:
+\begin{itemize}
+\item[$\Box$] Ils sont plus rapides que les chiffrements symétriques
+\item[$\Box$] Il n'y a pas besoin de s'échanger de clé secrète
+\item[$\Box$] Ils possèdent une meilleure propriété de \textit{confusion}
+\end{itemize}
+\end{q}
+
+\begin{q} 
+Qu'est ce qu'une \textit{fonction à sens unique à brêche secrète} ?
+\begin{itemize}
+\item[] \underline{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+\end{itemize}
+\end{q}
+
+\begin{q}
+Le protocole Diffie-Hellman est un protocole qui sert principalement à:
+\begin{itemize}
+\item[$\Box$] chiffrer/déchiffrer des messages
+\item[$\Box$] signer des messages
+\item[$\Box$] s'échanger une clé secrète
+\end{itemize}
+\end{q}
+
+\newpage
+
+\begin{q}
+Alice veut envoyer un message $m$ à Bob. Elle décide de chiffrer ce message via l'algorithme RSA. Elle aura besoin de:
+\begin{itemize}
+\item[$\Box$] la clé publique de Bob
+\item[$\Box$] la clé privée de Bob
+\item[$\Box$] la clé privée et la clé publique de Bob
+\end{itemize}
+Soit $(n_b,e_b)$ la clé publique de Bob et $d_b$ sa clé privée. Posez le calcul que vont effectuer:
+\begin{itemize}
+\item Alice lorsqu'elle chiffrera le message $m$: \underline{$m'=$~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+\item Bob lorsqu'il déchiffrera le message $m'$: \underline{$m=$~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+\end{itemize}
+\end{q}
+
+\begin{q}
+Sur quel(s) problème(s) difficile(s) est basé le cryptosystème RSA ?
+\begin{itemize}
+\item[$\Box$] Factorisation
+\item[$\Box$] LogarithmeDiscret
+\item[$\Box$] Diffie-Hellman
+\item[$\Box$] RacineIemeModulaire
+\end{itemize}
+\end{q}
+
+
+\begin{q}
+Alice veut \textbf{signer} le message qu'elle envoie à Bob. Le message va être signé avec
+\begin{itemize}
+\item[$\Box$] la clé publique d'Alice
+\item[$\Box$] la clé privée d'Alice
+\item[$\Box$] la clé privée de Bob
+\end{itemize}
+\end{q}
+
+\begin{q}
+Quelle(s) propriété(s) du message permet de garantir la signature ?
+\begin{itemize}
+\item[$\Box$] l'intégrité du message
+\item[$\Box$] la confidentialité du message
+\item[$\Box$] l'authenticité du message
+\end{itemize}
+\end{q}
+
+\begin{q}
+Alice veut envoyer un message chiffré via RSA à Bob. L'infrastructure à clé publique (ou PKI) lui permet de:
+\begin{itemize}
+\item[$\Box$] chiffrer le message de manière plus efficace
+\item[$\Box$] augmenter la confidentialité du message
+\item[$\Box$] s'assurer que la clé publique du destinataire est bien celle de Bob
+\end{itemize}
+\end{q}
+
+\newpage
+
+\section*{Sécurité logicielle}
+
+% \subsection*{Virologie}
+% \begin{q}
+% Quels sont les virus informatiques qui sont apparus les premiers ?
+% \begin{itemize}
+% \item[$\Box$] les virus compagnons
+% \item[$\Box$] les virus de boot
+% \item[$\Box$] les infecteurs de fichier
+% \end{itemize}
+% \end{q}
+
+% \begin{q}
+% Quelle technique est particulièrement efficace contre les virus polymorphiques (ainsi que les métamorphiques) ?
+% \begin{itemize}
+% \item[$\Box$] l'heuristique
+% \item[$\Box$] la recherche de signature
+% \item[$\Box$] l'émulation
+% \end{itemize}
+% \end{q}
+
+% \begin{q}
+% Qu'est-ce qu'un BotNet ? 
+% \begin{itemize}
+% \item[] \underline{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+% \end{itemize}
+% \end{q}
+
+% \begin{q}
+% Un antivirus qui détecte 100\% des virus connus et inconnus est:
+% \begin{itemize}
+% \item[$\Box$] très intéressant
+% \item[$\Box$] sûrement très cher
+% \item[$\Box$] un mensonge
+% \end{itemize}
+% \end{q}
+
+\subsection*{Failles logicielles}
+\begin{q}
+Soit le programme suivant:
+\begin{verbatim}
+int main(int argc, char** argv) {
+   char texte[46];
+   ...
+   strcpy(texte,argv[1]);
+   ...
+   return 0;
+}
+\end{verbatim}
+Ce programme est vulnérable à une attaque de type:
+\begin{itemize}
+\item[$\Box$] buffer overflow
+\item[$\Box$] race condition
+\item[$\Box$] format string
+\end{itemize}
+\end{q}
+
+\begin{q}
+Donnez deux moyens de prévenir ou d'empêcher les stack overflow :
+\begin{itemize}
+\item  \underline{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+\item  \underline{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+\end{itemize}
+\end{q}
+
+\begin{q}
+La variable argv[1] est renseignée par l'utilisateur. Laquelle de ces instructions est alors vulnérable à une attaque de type \textit{format string} :
+\begin{itemize}
+\item \texttt{strcpy(buffer,argv[1])}
+\item \texttt{printf(argv[1])}
+\item \texttt{sprintf(chaine,"\%10s",argv[1])}
+\end{itemize}
+\end{q}
+
+\begin{q}
+Quel(s) conseil(s) donneriez-vous à un jeune programmeur qui débute pour développer des applications comportant le moins de failles possible ?
+\begin{itemize}
+\item[] \underline{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+\item[] \underline{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+\item[] \underline{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+\item[] \underline{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+\item[] \underline{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+\item[] \underline{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+\item[] \underline{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+\item[] \underline{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+\item[] \underline{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+\item[] \underline{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+\end{itemize}
+
+\end{q}
+
+\end{document}

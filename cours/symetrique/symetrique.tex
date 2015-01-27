@@ -1,0 +1,1159 @@
+\documentclass{beamer}
+\usepackage[french]{babel}
+\mode<presentation>
+\usepackage[latin1]{inputenc}
+\usepackage{color}
+
+\usetheme{Luebeck}
+%\usecolortheme{seahorse}
+\setbeamertemplate{bibliography item}[text]
+\setbeamertemplate{blocks}[rounded][shadow=true]
+
+
+\title[Introduction à la sécurité informatique]{Cryptologie symétrique}
+\institute{\textbf{Pierre Ramet:} \texttt{ramet@labri.fr}}
+
+
+\author{DUT S4}
+\date{2013-2014}
+
+%\setcounter{tocdepth}{1}
+\begin{document}
+
+\begin{frame}
+
+  \titlepage
+
+\end{frame}
+
+\AtBeginSubsection[]
+                  {
+                    \begin{frame}<beamer>
+                      \frametitle{Plan}
+                      \tableofcontents[currentsection,currentsubsection,sectionstyle=show/shaded,subsectionstyle=show/shaded/hide]
+                    \end{frame}
+                  }
+                  
+\section{La cryptologie}
+\subsection{Introduction}
+
+\begin{frame}{Un peu d'histoire}
+\begin{itemize}
+\item Depuis la nuit des temps les hommes, surtout les
+militaires, ont pratiqué l'espionnage et le contre-espionnage
+\item Le chiffrement des messages est donc né presque
+en même temps que l'écriture
+\end{itemize}
+\begin{columns}
+\begin{column}[l]{5cm}
+\begin{figure}
+\includegraphics[scale=0.15]{h1.png}
+\caption{Le disque de Phaïstos (Crète 1700 av. JC )}
+\end{figure}
+\end{column}
+\begin{column}[l]{5cm}
+\begin{figure}
+\includegraphics[scale=0.15]{h2.png}
+\caption{Le Scytale (Sparte 400 av. JC)}
+\end{figure}
+\end{column}
+\end{columns}
+\end{frame}
+
+
+
+\begin{frame}{Introduction}
+\begin{itemize}
+\item La cryptologie est la science des messages secrets et des codes
+chiffrés utilisée traditionnellement par les militaires et les
+gouvernements
+\item Depuis l'avènement des transactions électroniques, la
+cryptologie s'est démocratisée
+\begin{itemize}
+\item Banques
+\item Internet
+\item Mail
+\item ...
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Définitions}
+\begin{itemize}
+\item Cryptographie
+\begin{definition}
+Ensemble des principes, méthodes et techniques dont l'application
+assure le chiffrement et le déchiffrement des données, afin d'en
+préserver la confidentialité et l'authenticité
+\end{definition}
+\item Cryptanalyse
+\begin{definition}
+Ensemble des méthodes et procédés de décryptage visant à rétablir en
+clair un cryptogramme, sans connaissance préalable de la clé de
+chiffrement
+\end{definition}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Objectifs}
+\begin{itemize}
+\item Le but de la cryptographie est de développer des procédés
+permettant à deux personnes de communiquer tout en
+protégeant leur messages
+\begin{itemize}
+\item Préserver la \textbf{confidentialité} des messages
+\item Vérifier l'\textbf{intégrité} des messages
+\end{itemize}
+\item Outil important de la politique de sécurité
+\end{itemize}
+\end{frame}
+
+
+\subsection{La cryptographie}
+
+\begin{frame}{Définitions}
+\begin{figure}[!h]
+\includegraphics[scale=0.3]{proc.png}
+\end{figure}
+\begin{itemize}
+\item \textbf{Texte en clair} (\textit{PlainText})
+\begin{definition}
+Texte d'origine, immédiatement intelligible et
+pouvant donc être exploité directement, sans recours au
+déchiffrement 
+\end{definition}
+\item \textbf{Chiffrement} \textit{(Encryption)}
+\begin{definition}
+Opération par laquelle est substitué, à un texte en
+clair, un texte inintelligible, inexploitable pour quiconque ne
+possède pas la clé permettant de le ramener à sa forme
+initiale 
+\end{definition}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Définitions (2)}
+\begin{figure}[!h]
+\includegraphics[scale=0.3]{proc.png}
+\end{figure}
+\begin{itemize}
+\item \textbf{Cryptogramme} (\textit{Texte chiffré},\textit{Ciphertext})
+\begin{definition}
+Message rendu inintelligible
+grâce au chiffrement, qui ne peut être compris et utilisé que
+par les seules personnes en possession de la clé permettant de
+le déchiffrer
+\end{definition}
+\item \textbf{Déchiffrement} \textit{(Decryption)}
+\begin{definition}
+Opération inverse d'un chiffrement réversible,
+permettant à une personne autorisée, en possession de la clé,
+de rétablir en clair un cryptogramme
+\end{definition}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Qu'est ce qu'un cryptosystème ?}
+\begin{definition}
+Un cryptosystème est un quintuplet $(M,C,K,E,D)$
+\begin{itemize}
+\item $M$ l'ensemble des textes clairs possibles
+\item $C$ l'ensemble des textes chiffrés
+\item $K$ l'ensemble des clés
+\item $E$ l'ensemble des fonctions de chiffrement
+\begin{itemize}
+\item De la forme $e_k, k \in K$,t.q $e_k(m) \in C$
+\end{itemize}
+\item $D$ l'ensemble des fonctions de déchiffrement
+\begin{itemize}
+\item De la forme  $d_k, k \in K$, t.q $d_k(e_k(m))=m$ 
+\end{itemize}
+\end{itemize}
+\end{definition}
+\end{frame}
+
+\begin{frame}{Exemple}
+\begin{itemize}
+\item Deux espions français veulent s'échanger des informations dans un café
+\item Protocole:
+\begin{itemize}
+\item Ils se mettent d'accord sur une langue étrangère qu'ils connaissent tous les deux
+\item Ils s'échangent leurs informations dans cette langue
+\end{itemize}
+\item Déterminer $M$ et $C$
+\item Déterminer $K$
+\item Déterminer $e_k$ et $d_k$ pour un $k$ fixé
+\item Déterminer $E$ et $D$
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Qualités d'un cryptosystème}
+\begin{itemize}
+\item Trois qualités recherchées:
+\begin{itemize}
+\item \textbf{Confusion}
+\begin{itemize}
+\item Aucune propriété statistique ne peut être
+déduite du message chiffré $\Rightarrow$ message inintelligible
+\end{itemize}
+\item \textbf{Diffusion}
+\begin{itemize}
+\item Toute modification du message en clair se
+traduit par une modification complète du
+chiffré
+\end{itemize}
+\item \textbf{Robustesse de la clé}
+\begin{itemize}
+\item Difficile de déterminer $k$ (difficile également d'énumérer tous les $k$)
+\end{itemize}
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+%\begin{frame}{Les deux types de cryptosystèmes}
+%\begin{itemize}
+%\item Cryptosystème à \textbf{clé secrète} (ou cryptosystème symétrique)
+%\begin{itemize}
+%\item Cryptosystème permettant à deux personnes possédant une clé secrète
+%commune de s'échanger des messages de façon sécurisée
+%\item La confidentialité des messages dépend de la confidentialité de cette clé
+%et de la robustesse de l'algorithme utilisé
+%\end{itemize}
+%\item Cryptosystème à \textbf{clé publique} (ou cryptosystème asymétrique)
+%\begin{itemize}
+%\item Cryptosystème permettant à une personne connaissant la clé publique d'une
+%autre personne de lui envoyer des messages de façon sécurisée
+%\item Cette seconde personne connaissant la clé privée associée à sa clé
+%publique peut déchiffrer les messages qui lui ont été envoyés
+%\item La confidentialité des messages dépend de l'authenticité de la clé
+%publique et de la robustesse de l'algorithme utilisé
+%\end{itemize}
+%\end{itemize}
+%\end{frame}        
+
+\subsection{La cryptanalyse}
+\begin{frame}{Cryptanalyse}
+\begin{itemize}
+\item Afin de briser un code secret et obtenir ainsi les textes en clair,
+l'attaquant a diverses possibilités :
+\begin{itemize}
+\item Attaques passives : par écoute électronique, l'attaquant obtient une copie de
+tous les textes chiffrés échangés entre les intervenants
+\item Attaques actives : l'attaquant joue un rôle actif lors du protocole et peut
+altérer ou détruire des messages
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Types d'attaques}
+Attaques possbiles:
+\begin{enumerate}
+\item \textbf{A texte chiffré}
+\begin{itemize}
+\item L'attaquant possède une copie des cryptogrammes échangés
+\end{itemize} 
+\item \textbf{A texte en clair connu}
+\begin{itemize}
+\item L'attaquant possède plusieurs paires (texte clair,texte chiffré)
+\end{itemize} 
+\item \textbf{A texte clair choisi}
+\begin{itemize}
+\item  L'attaquant possède plusieurs paires (texte clair,texte chiffré) dont il a choisi le texte clair
+\end{itemize} 
+\item \textbf{A texte chiffré choisi}
+\begin{itemize}
+\item  L'attaquant choisit plusieurs cryptogrammes dont il obtient le texte en clair correspondant
+\end{itemize} 
+\end{enumerate}
+\end{frame}
+
+\begin{frame}{Attaques physiques}
+Ne pas oublier les attaques physiques!
+\begin{itemize}
+\item Les algorithmes de chiffrement et déchiffrement doivent être implémentés sur un calculateur
+\begin{itemize}
+\item Ordinateur personnel
+\item Carte à puce
+\end{itemize}
+\item Observation indirecte du calculateur (\textit{side channel attacks})
+\begin{itemize}
+\item Mesure des la consomation électrique (\textit{Power Analysis})
+\item Mesure du rayonnement électromagnétique
+\item Mesure du temps (\textit{Timing attacks})
+\item RSA \& Hyper Threading 2005
+\end{itemize}
+\item Erreurs d'implémentation
+\begin{itemize}
+\item Clés openssl debian 2006
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+
+
+\begin{frame}{Résultats d'une attaque}
+\begin{enumerate}
+\item \textbf{Cassage partiel}
+\begin{itemize}
+\item L'attaquant calcule quelques informations sur le texte en clair
+\end{itemize}
+\item \textbf{Cassage local}
+\begin{itemize}
+\item L'attaquant calcule quelques couples (texte en clair,texte chiffré)
+\end{itemize}
+\item \textbf{Cassage global}
+\begin{itemize}
+\item L'attaquant calcule la fonction $d_k$, et peut donc déchiffrer tout message
+\end{itemize}
+\item \textbf{Cassage complet}
+\begin{itemize}
+\item L'attaquant connait la clé $k$ 
+\end{itemize}
+\end{enumerate}
+\end{frame}
+
+
+\begin{frame}{Sûreté d'un cryptosystème}
+\begin{definition}
+Définir un protocole (ou cryptosystème) sûr c'est définir un protocole robuste face à une attaque disposant de moyens importants (Entrée) et ayant un objectif (Sortie) modeste.
+\end{definition}
+~\\
+
+\begin{figure}[!h]
+\includegraphics[scale=0.3]{rob.png}
+\end{figure}
+\end{frame}
+
+
+\begin{frame}{Un exemple d'attaque célèbre}
+\begin{itemize}
+\item La bataille de Midway
+\begin{itemize}
+\item Juin 1942, Américains vs Japonais
+\end{itemize}
+\item L'attaque:
+\begin{itemize}
+\item Les américains ont envoyés un faux message en clair entre deux de leurs postes
+\item Ils ont attendu que les Japonais l'interceptent
+\item Et qu'ils le rétransmettent \textbf{chiffré} à leur état major !
+\end{itemize}
+\item Les américains ont disposé d'un couple $(m,e_k(m))$ et ont pu en déduire $k$
+\item Quel type d'attaque ? Quel résultat ?
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Récapitulatif}
+\begin{itemize}
+\item La \textbf{cryptographie} est l'art de chiffrer. Elle renforce:
+\begin{itemize}
+\item La \textbf{confidentialité}
+\item L'\textbf{authenticité}
+\end{itemize}
+\item La \textbf{cryptanalyse} est l'art de casser des chiffrements
+\begin{itemize}
+\item Plusieurs types d'\textbf{attaques} (texte chiffré connu, texte clair connu, etc.)
+\item Plusieurs types de \textbf{résultats} (cassage partiel, cassage total, etc.)
+\end{itemize}
+\item Un protocole de cryptographie \textbf{robuste} est un protocole qui :
+\begin{itemize}
+\item pour une attaque facile (entrées importantes) ...
+\item révèle peu d'informations
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+
+
+%=========================================================================
+\section{Vieux chiffrements alphabétiques}
+\subsection{Chiffrement par transposition}
+
+\begin{frame}{La cryptographie à clé secrète}
+\begin{itemize}
+\item La cryptographie à clé secrète
+\begin{itemize}
+\item Les deux acteurs s'échangent une clé secrète (mot de passe)
+\end{itemize}
+\item La sécurité du chiffrement dépend de la non divulgation de cette clé
+\end{itemize}
+\begin{figure}
+\includegraphics[scale=0.25]{secrete.png}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Chiffrement par transposition}
+\begin{itemize}
+\item Chiffrement de type \textit{anagramme}
+\begin{itemize}
+\item Les lettres du messages sont déplacées
+\end{itemize}
+\item Niveau de sécurité théorique
+\begin{itemize}
+\item Message de $35$ lettres: $35!$ chiffrés possibles
+\end{itemize}
+\begin{itemize}
+\item Problèmes
+\begin{itemize}
+\item Confusion sur la syntaxe, mais chaque lettre conserve sa valeur
+\item Diffusion ?
+\item Pas robuste pour des messages courts
+\item Clé \textit{"complexe"}
+\end{itemize}
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Exemple de transposition}
+\begin{itemize}
+\item La scytale spartiate (5ème siècle av. JC) :
+\end{itemize}
+\begin{figure}[!h]
+\includegraphics[scale=0.4]{spar.png}
+\end{figure}
+\end{frame}
+
+\subsection{Chiffrements monoalphabetiques}
+\begin{frame}{Substitution}
+\begin{itemize}
+\item Chiffrement en changeant d'alphabet
+\begin{itemize}
+\item Kama Sutra : mlecchita-vikalpà ou art de l'écriture
+secrète (4ème siècle av JC)
+\end{itemize}
+\item Niveau de sécurité \textbf{théorique}
+\begin{itemize}
+\item Alphabet à 26 lettres: $26!$ alphabets possibles
+\end{itemize}
+\item Problèmes
+\begin{itemize}
+\item Confusion sur l'alphabet mais ...
+\item ... chaque lettre conserve sa place d'origine
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Le chiffrement de César}
+\begin{itemize}
+\item Jules César : chiffrement d'un message par décalage
+des lettres dans l'alphabet $(a->d, b->e, c->f ...)$
+\item On travaille modulo 26
+\item La clé est le décalage (26 possibilités)
+\end{itemize}
+\begin{figure}[!h]
+\includegraphics[scale=0.25]{cesar.png}
+\caption{César, avec d=3}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Le chiffrement de César (2)}
+\begin{figure}[!h]
+\includegraphics[scale=0.4]{cesar2.png}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Problèmes}
+\begin{itemize}
+\item Confusion faible
+\item Pas de diffusion
+\item Seulement 26 clés possibles
+\item Cassage de l'algorithme:
+\begin{itemize}
+\item Tester toutes les clés ! (attaque \textit{exhaustive})
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{La substitution monoalphabétique}
+La \textbf{substitution monoalphabétique}:
+\begin{itemize}
+\item Remplacer chaque lettre de l'alphabet par une autre
+\begin{itemize}
+\item Revient à un décalage différent pour chaque lettre
+\end{itemize}
+\item Clé: la \textbf{permutation}
+\begin{itemize}
+\item Alphabet clair: \texttt{abcdefghijklmnopqrstuvwxyz}
+\item Alphabet chiffré: \texttt{MOTSECRUVWXYZABDFGHIJKLNPQ}
+\end{itemize}
+\item Texte clair: l erreur est humaine, y persévérer est diabolique
+\item Texte chiffré: Y EGGEJG EHI UJZMVAE, P DEGHEKEGEG EHI SVMOBYVFJE
+\end{itemize}
+\end{frame}
+
+\begin{frame}{La substitution monoalphabétique (2)}
+\begin{itemize}
+\item Grand nombre de clés
+\item Mais toujours pas de diffusion
+\item Même si l'algorithme est connu, il est impossible d'essayer les
+$26!-1$ clés possibles (403291461126605635583999999)
+\item Il est cependant possible de tirer partie des caracteristiques de la langue française
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Cryptanalyse de la substitution monoalphabétique}
+\begin{itemize}
+\item Principe (Al-Kindi - 9ème siècle) 
+\item Toutes les lettres de la langue française n'ont pas la même fréquence d'apparition
+\item Par analyse statistique de la fréquence des lettres de l'alphabet chiffré, il est possible de retrouver les substitutions
+\item Particulièrement vrai si le texte chiffré est long
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Cryptanalyse de la substitution monoalphabétique (2)}
+\begin{figure}[!h]
+\includegraphics[scale=0.25]{freq.png}
+\end{figure}
+\begin{figure}[!h]
+\includegraphics[scale=0.3]{freq2.png}
+\end{figure}
+
+\end{frame}
+
+
+\begin{frame}{Cryptanalyse de la substitution monoalphabétique (3)}
+\begin{itemize}
+\item Pour déterminer les substitutions des lettres dont la fréquence est semblables à d'autres lettres:
+\begin{itemize}
+\item Calcul des fréquence de blocs de deux lettres ("de","au","ch")
+\item Calcul des fréquences des blocs de trois lettres
+\end{itemize}
+\item Vérifier de manière automatique avec un dictionnaire 
+\item Au pire, une dizaine d'essais sont nécessaires
+\begin{itemize}
+\item Si le texte chiffré est suffisamment long !
+\item Si le texte chiffré appartient bien à une langue !
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Autres cryptosystèmes}
+\begin{itemize}
+\item ... et bien d'autres cryptosystèmes à substitution monoalphabétique:
+\begin{itemize}
+\item Chiffrement affine
+\item OU logique
+\item etc
+\end{itemize}
+\item Mais tous sont vulnérables à une analyse fréquentielle
+\end{itemize}
+
+\end{frame}
+
+
+\begin{frame}{Récapitulatif}
+\begin{itemize}
+\item Les deux méthodes précédentes appartiennent aux systèmes de
+\textbf{substitution mono-alphabétique}
+\begin{itemize}
+\item Dans un texte en clair, une lettre est toujours substituée par la même lettre
+\end{itemize}
+\item Si le texte est suffisamment long, il est possible de trouver la
+substitution en analysant \textbf{la fréquence des lettres}
+\begin{itemize}
+\item Donc, le texte en clair peut être retrouvé à partir du cryptogramme seul
+\item Quel type d'attaque ?
+\end{itemize}
+\end{itemize}
+\begin{block}{}
+Même si le nombre de clés est grand,
+cette méthode n'est pas acceptable
+\end{block}
+\end{frame}
+
+\subsection{Chiffrements polyalphabétiques}
+
+\begin{frame}{Le chiffrement de Vigenere}
+L'algorithme de Vigenere
+\begin{itemize}
+\item Blaise Vigenère 1523-1596
+\item Clé=suite de lettres de longueur $k$ (ex: "ac", k=2)
+\item Algorithme : Additionner à chaque lettre la lettre de la clé. 
+\end{itemize}
+\begin{figure}
+\begin{tabular}{|c|c|c|c|c|c|c|}
+\hline
+C & H & A & T & E & A & U \\
+\hline
+A & C & A & C & A & C & A \\
+\hline
+\hline
+D & K & B & W & F & D & V \\
+\hline
+\end{tabular}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Le chiffrement de Vigenere (2)}
+\begin{itemize}
+\item Le chiffre de Vigenère appartient aux systèmes de substitution
+poly-alphabétique.
+\begin{itemize}
+\item Dans un texte en clair, une lettre est substituée par une autre lettre
+dépendant de sa position dans le texte
+\end{itemize}
+\item Confusion: un peu mieux
+\item Diffusion: toujours aucune
+\item Si le texte est suffisamment long, il est possible de trouver les
+substitutions en découpant le texte selon la longueur présumée
+de la clé puis en analysant les fréquences des lettres
+\begin{itemize}
+\item Donc, le texte en clair peut être retrouvé à partir du cryptogramme seul
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Cryptanalyse Vigenere}
+Cryptanalyse Vigenere:
+\begin{itemize}
+\item Méthode en trois étapes:
+\begin{enumerate}
+\item Trouver la longeur $l$ de la clé
+\item Découper le message $M$ en $l$ messages $m_0$...$m_{l-1}$
+\begin{itemize}
+\item $m_i$ contient l'ensemble des lettres dont la position dans le texte modulo $l$ est égal à $i$
+\item Exemple: si l'on aligne $M$ sur $l$ colonnes, $m_i$ est la ième colonne (cf. tableau)
+\item Toutes les lettres d'un $m_i$ sont chiffrées avec le même décalage
+\end{itemize}
+\item Analyse fréquentielle sur chacun des $m_i$
+\begin{itemize}
+\item Déterminer le décalage de chaque colonne
+\end{itemize}
+\end{enumerate}
+\item Sortie: la clé $k$
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Trouver la longueur de la clé}
+Première méthode: \textbf{répetition de séquences}
+\begin{itemize}
+\item On part du principe que:
+\begin{itemize}
+\item Deux mots identiques dans le texte chiffré $\Rightarrow$ sûrement deux mots identiques dans le texte en clair
+\end{itemize}
+\item La premieres lettres de ces deux mots a été chifrée avec la même lettre de la clé
+\begin{itemize}
+\item Surtout à la même position dans la clé !
+\end{itemize}
+\item La distance entre les deux mots est donc un multiple de la longueur de la clé
+\item Avec plusieurs séquences identifiées, on arrive a détermine la longueur de la clé
+\end{itemize}
+\begin{figure}[!h]
+\includegraphics[scale=0.3]{repet.png}
+\end{figure}
+\end{frame}
+
+
+\begin{frame}{Exemple}
+\begin{figure}
+\texttt{\small{
+XAUNMEESYIEDTLLFGSNBWQ UFXPQTYORUTYIIN\underline{UMQI}EUL\\
+SMFAFXGUTYBXXAGBHMIFII M\underline{UMQI}DEKRIFRIRZQUHIENO\\
+O\underline{OIGR}MLYETYOVQRYSIXEOK IYPY\underline{OIGR}FBWPIYRBQURJIY\\
+EM\underline{JIGRY}KXYACPPQSPBVESI RZQRUFREDY\underline{JIGRY}KXBLOPJ\\
+ARNPUGEFBWMILXMZSMZYXP NBPUMYZMEEFBUGENLRDEPB\\
+JXONQEZTMBWOEFIIPAHPPQ BFLGDEMFWFAHQ
+}}
+
+\end{figure}
+\begin{itemize}
+\item On trouve:
+\begin{itemize}
+\item UMQI se retrouve après 30 caractères
+\item OIGR se retrouve après 25 caractères
+\item JIGRY se retrouve après 30 caractères
+\end{itemize}
+\item La longueur de la clé doit être un diviseur de 30 et de 25 : il est possible qu'il s'agisse de 5
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Trouver la longueur de la clé}
+Deuxième méthode: \textbf{indices de coïncidence}
+\begin{itemize}
+\item Indice de coïncidence d'un texte:
+\begin{itemize}
+\item L'indice de coïncidence est la probabilité que deux lettres choisies au hasard dans un message $m$ donné soient identiques
+\item $IC \simeq \sum_{i \in [1,26]} \frac{f_{i}^2}{\mid m \mid^2}$
+\begin{itemize}
+\item $f_i$ est le nombre d'occurence de la lettre $i$ dans le message
+\item $\mid m \mid$ est la taille du message
+\end{itemize}
+\item Pour un message en français, on a $IC \simeq 0,075$
+\begin{itemize}
+\item .. et également pour toute substitution \textbf{monoalphabétique}
+\item Calculé d'après la fréquence des lettres (cf. précédemment)
+\end{itemize}
+\item Pour un message aléatoire, on a $IC \simeq 26* \frac{1}{26^{2}} \simeq 0,038$
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Trouver la longueur de la clé}
+Algorithme:
+\begin{itemize}
+\item Pour $l$ de 1 à $+\infty$
+\begin{itemize}
+\item Découper le message $M$ en $l$ messages $m_0\dots m_{l-1}$
+\begin{itemize}
+\item $m_i$ est l'ensemble des lettres dont la position modulo $l$ vaut $i$
+\end{itemize}
+\item Pour tout message $m_i$:
+\begin{itemize}
+\item Calculer $IC_i=IC(m_i)$
+\end{itemize}
+\item Si tous les $IC_i$ sont proches de $0,075$, renvoyer $l$
+\end{itemize}
+\end{itemize}
+Exemple pour le texte précédent:
+
+
+\begin{figure}
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+ & i=1 & i=2 & i=3 & i=4 & i=5   \\
+\hline
+l=1 & 0,045 &  &  &  &    \\
+\hline
+l=2 & 0,046 & 0,041 &  &  &    \\
+\hline
+l=3 & 0,043 & 0,050 & 0,047 &  &    \\
+\hline
+l=4 & 0,042 & 0,039 & 0,046 & 0,040 &    \\
+\hline
+l=5 & 0,063 & 0,068 & 0,069 & 0,061 & 0,072   \\
+\hline
+\end{tabular}
+\end{figure}
+
+\end{frame}
+
+\begin{frame}{Casser la clé}
+\begin{itemize}
+\item Avec la connaissance de $l$, casser la clé devient trivial
+\item Découper le message $M$ en $l$ messages $m_0\dots m_{l-1}$
+\begin{itemize}
+\item $m_i$ est l'ensemble des lettres dont la position modulo $l$ vaut $i$
+\end{itemize}
+\item Déterminer le décalage $d_i$ pour chaque $m_i$
+\begin{itemize}
+\item Via l'analyse de fréquence \textit{"classique"}
+\end{itemize}
+\item La clé est $d_0d_1 \dots d_{l-1}$
+\item L'algorithme de Vigenere est donc sensible à une \textbf{attaque à texte chiffré}
+\begin{itemize}
+\item Encore une fois si le texte est long, et qu'il est écrit dans un langue
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Améliorations}
+\begin{itemize}
+\item Améliorations des chiffrements polyalphabétiques
+\begin{itemize}
+\item Enigma (1920): 5 rotors de substitution ($2^{50}$ clés)
+\item La Bombe de Turing l'a cassé en une heure
+\item Etape décisive dans la victoire des alliés
+\end{itemize}
+\begin{figure}
+\includegraphics[scale=0.3]{enigma.png}
+\end{figure}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Le \textit{One-Time Pad}}
+\begin{itemize}
+\item Chiffrement parfait
+\begin{itemize}
+\item La clé est aussi longue que le message à chiffrer
+\item La clé est nouvelle pour chaque nouveau message
+\end{itemize}
+\item Confusion totale
+\begin{itemize}
+\item Chiffrement de "aa...aaa" complétement aléatoire
+\end{itemize}
+\item Diffusion totale
+\begin{itemize}
+\item Assurée car la clé n'est \textbf{jamais} réutilisée :
+résultat différent lorsque on rechiffre "aa...aaa"
+\end{itemize}
+\item Utilisé par le $KGB$ (malette diplomatique)
+\item Problèmes:
+\begin{itemize}
+\item Transmission de la clé ? Stockage ?
+\item Si on arrive à transmettre la clé, pourquoi pas le message ?
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Récapitulatif}
+\begin{itemize}
+\item Les chiffrement à substitution polyalphabétique
+\begin{itemize}
+\item Vigenere: protocole \textbf{faible}
+\item \textit{One-Time Pad}:\textbf{ peu pratique}
+\end{itemize}
+\item Les chiffrement alphabétiques ont été peu à peu \textbf{abandonnés}
+\item Pour laisser la place aux chiffrements par \textbf{blocs}
+\end{itemize}
+\end{frame}
+
+\section{Chiffrement par blocs}
+\subsection{Le principe}
+\begin{frame}{Chiffrement par blocs}
+Chiffrement par blocs:
+\begin{itemize}
+\item On ne travaille plus sur des lettres de l'alphabet, mais sur un ensemble de \textbf{blocs}
+\item Taille des blocs: 32bits ... 256bits
+\item Le message $m$ est découpé en $n$ blocs
+\item Chaque bloc est chiffré
+\item Le message chiffré $m'$ est la concaténation des blocs chiffrés
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Premier exemple: le mode ECB}
+\begin{itemize}
+\item Le mode \textbf{ECB} (Electronic Cypher Block)
+\item Mode de chiffrement \textbf{le plus simple}
+\item Chaque bloc est chiffré tout simplement avec la clé
+\begin{figure}
+\includegraphics[scale=0.4]{ecb.png}
+\end{figure}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Problèmes}
+Mode \textbf{trop} simple:
+\begin{itemize}
+\item Mode de chiffrement pas très sûr
+\item Revient à faire de la substitution monoalphabétique (sur un alphabet plus grand)
+\item A votre avis:
+\begin{itemize}
+\item Confusion ?
+\item Diffusion ?
+\end{itemize}
+\item Rarement utilisé
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Problèmes (2)}
+\begin{itemize}
+\item Deux textes en clair:
+\begin{figure}[h!]
+JOHN  105000\\
+JACK  500000
+\end{figure}
+\item Textes chiffrés (blocs de deux lettres) :
+\begin{figure}[h!]
+$Q9|2D|\textcolor{red}{FP}|VX|\textcolor{green}{C9}|\textcolor{blue}{IO}$\\
+$LD|AS|\textcolor{red}{FP}|\textcolor{green}{C9}|\textcolor{blue}{IO}|\textcolor{blue}{IO}$
+\end{figure}
+\item Si John connaît son salaire, il peut deviner celui de Jack
+\begin{itemize}
+\item Et être très jaloux !
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Le mode CBC}
+\begin{itemize}
+\item Le mode \textbf{CBC} (Cypher Block Chaining)
+\item Le résultat du chiffrement d'un bloc $m$ dépend
+\begin{itemize}
+\item De la clé
+\item Du bloc $m-1$
+\end{itemize}
+\item Exemple:
+\begin{figure}
+\includegraphics[scale=0.4]{cbc.png}
+\end{figure}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Etude}
+\begin{itemize}
+\item Avantages:
+\begin{itemize}
+\item Bien meilleure diffusion !
+\end{itemize}
+\item Inconvénients:
+\begin{itemize}
+\item Il faut se mettre d'accord sur un vecteur d'initialisation
+\end{itemize}
+\item Mode \textbf{très utilisé}
+\end{itemize}
+\begin{figure}
+\includegraphics[scale=0.3]{image.png}
+\caption{Image chiffrée (blocs de 4 pixels)}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Les autres modes}
+\begin{itemize}
+\item D'autres modes dans la même veine:
+\begin{itemize}
+\item \textbf{CFB}: Cypher FeedBack Mode
+\item \textbf{OFB}: Output FeedBack Mode
+\item \textbf{CTR}: CounTeR Mode
+\item etc.
+\end{itemize}
+\item Presque tous ont une bonne diffusion
+\item Voyons maintenant les algorithmes de \textbf{chiffrement} des blocs
+\end{itemize}
+\end{frame}
+
+\subsection{Les réseaux de Feistel}
+
+\begin{frame}{Les réseaux de Feistel}
+\begin{definition}
+Un réseau de Feistel est une construction utilisée dans les algorithmes de chiffrement par bloc, nommée d'après le cryptologue d'IBM, Horst Feistel
+\end{definition}
+\begin{itemize}
+\item Fonction de chiffrement des blocs (le carré "Chiffrement de bloc" des shémas précédent)
+\item Un réseau de Feistel est défini par :
+\begin{itemize}
+\item Une longueur de bloc $l$
+\item Un espace de clé $K$
+\item Un nombre de ronde $r$
+\item Un générateur de sous-clés $g$, qui divise une clé $k$ en $r$ sous-clés
+\item Une fonction de chiffrement $f$ ($f^{-1}$ doit exister)
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Fonctionnement}
+\begin{itemize}
+\item Principe d'un réseau de Feistel;
+\begin{itemize}
+\item On découpe le bloc à chiffrer en deux bloc $L$ et $R$ de même taille
+\item On calcule $r$ sous-clés $k_1...k_r$ à partir de la clé $k$
+\item On effectue $r$ \textit{rondes} consécutives:
+\end{itemize}
+\end{itemize}
+\begin{figure}
+\includegraphics[scale=0.45]{ronde.png}
+\end{figure}
+\end{frame}
+
+
+\begin{frame}{Les réseaux de Feistel (2)}
+\begin{figure}
+\includegraphics[scale=0.3]{feistel.png}
+\end{figure}
+\end{frame}
+
+
+\begin{frame}{Les réseaux de Feistel (3)}
+\begin{itemize}
+\item \textbf{Quelques précisions}:
+\begin{itemize}
+\item Générateur des clés $k_i$: on choisit $x$ bits depuis $k$ 
+\begin{itemize}
+\item Et on les permute éventuellement
+\end{itemize}
+\item La fonction $f$:
+\begin{itemize}
+\item Souvent \textbf{Substitution + Permutation}
+\end{itemize}
+\end{itemize}
+\item \textbf{Avantages} des réseaux de Feistel
+\begin{itemize}
+\item Bonne diffusion si $r$ bien choisi
+\item Bonne confusion si $f$ bien choisie
+\item Facile à implémenter (hardware)
+\item Paralellisable
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+
+\subsection{DES, AES et les autres}
+\begin{frame}{DES}
+L'algorithme DES:
+\begin{itemize}
+\item \textbf{Data Encryption Standard}
+\item Historique:
+\begin{itemize}
+\item Milieu des années 70
+\item Premier algorithme de chiffrement pour l'industrie
+\end{itemize}
+\item Principe:
+\begin{itemize}
+\item C'est un réseau de Feistel
+\item Blocs de 64bits (32+32)
+\item Clé $k$ de 56bits
+\begin{itemize}
+\item Sous-clés $k_i$ de 48bits
+\end{itemize}
+\item Nombre de rondes $r$ = 16
+\item Fonction $f$: permutation + substitution
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{La fonction $f$ de DES}
+\begin{itemize}
+\item La fonction $f$ de DES:
+\begin{itemize}
+\item On XOR le demi-bloc avec $k_i$
+\item Substitution de bits (SBOXes)
+\item Puis permutation (PBOX)
+\end{itemize}
+\begin{figure}
+\includegraphics[scale=0.2]{des.png}
+\end{figure}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Propriétés de DES}
+\begin{itemize}
+\item Avantages
+\begin{itemize}
+\item Rapide !
+\begin{itemize}
+\item Puces dédiées au DES : en 1995, le 6868 de VLSI permettait de chiffrer 64 Mo par seconde
+\end{itemize}
+\item Bonne diffusion
+\item Bonne confusion
+\item Facile à implémenter en hard (cartes à puce)
+\end{itemize}
+\item Inconvénients
+\begin{itemize}
+\item Taille de la clé (56 bits)
+\item Méthodes pour casser la clé:
+\begin{itemize}
+\item Attaque exhaustive
+\item Cryptanalyse linéaire
+\item Cryptanalyse différentielle ($2^{47}$ textes clairs choisis nécessaires)
+\end{itemize}
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Confusion et diffusion}
+\begin{itemize}
+\item \textbf{Confusion}
+\begin{itemize}
+\item Confusion totale
+\item Chiffrement de "aaaaaaaaaaaaaaaaaaaa" :
+\begin{figure}
+\texttt{f99a 4388 c6a8 57db 1a0c c4d4\\
+ad1a 89f7 119d 9d91 7827 94b5}
+\end{figure}
+\end{itemize}
+\item \textbf{Diffusion}
+\begin{itemize}
+\item Diffusion totale (en mode CBC)
+\item Chiffrement de "eaaaaaaaaaaaaaaaaaaa" :
+\begin{figure}
+\texttt{a290 3816 10d3 97e7 aa2a 25f3\\
+c3e0 a3cf 9438 f2b2 dbb8 f3da}
+\end{figure}
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Coûts des attaques}
+\begin{figure}
+\includegraphics[scale=0.4]{desa.png}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Attaque exhaustive}
+\begin{itemize}
+\item Coût d'une attaque exhaustive en 1996:
+\begin{figure}
+\includegraphics[scale=0.3]{dese.png}
+\end{figure}
+\item Maintenant, encore moins cher ! (Clusters de PS3)
+\item Et DES représente toujours 50\% du marché
+\begin{itemize}
+\item Car pas cher et rapide
+\item Rapporte entre 75M\$ et 125M\$ aux USA chaque année
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Cluster de PS3}
+\begin{figure}
+\includegraphics[scale=0.4]{ps3.png}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Autres algorithmes}
+Autres algorithmes de type réseau de Feistel:
+\begin{itemize}
+\item \textbf{TDES} (Triple DES)
+\begin{itemize}
+\item On enchaîne trois DES (force effective 112bits de clé)
+\item Lent
+\end{itemize}
+\item \textbf{BlowFish}
+\begin{itemize}
+\item Blocs de 64bits
+\item Clé de 32 à 448bits
+\item 16 rondes
+\end{itemize}
+\item \textbf{Camelia}
+\begin{itemize}
+\item Clé de 128 à 256bits
+\item 18 à 24 rondes
+\item Standard du gouvernement Japonais
+\end{itemize}
+\item \textbf{RC5}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{AES}
+L'algorithme \textbf{AES} (Advanced Encryption Standard):
+\begin{itemize}
+\item Devant l'échec de DES,  nouveau standard en 2000
+\item Variante du réseau de Feistel
+\item Trois versions:
+\begin{itemize}
+\item Chiffrement de blocs de 128 bits avec une clé de 128 bits (10 rondes)
+\item Chiffrement de blocs de 192 bits avec une clé de 192 bits (12 rondes)
+\item Chiffrement de blocs de 256 bits avec une clé de 256 bits (14 rondes)
+\end{itemize}
+\item Fonction $f$: calcul matriciel
+\end{itemize}
+\end{frame}
+
+\begin{frame}{AES}
+\begin{itemize}
+\item Plusieurs modes (ECB, CBC, CTR, etc)
+\item Plus rapide que TDES
+\item Nécessite peu de mémoire (cartes à puces)
+\item Résitant aux attaques:
+\begin{itemize}
+\item Pas de cryptanalyse linéaire
+\item Pas de cryptanalyse différentielle
+\end{itemize}
+\item Actuellement, la seule solution est la \textbf{recherche exhaustive}
+\item C'est le nouveau standard
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Récapitualtif}
+\begin{itemize}
+\item Cryptologie = cryptographie + cryptanalyse
+\item Substitutions alphabétiques
+\begin{itemize}
+\item Vulnérables aux analyses de fréquences
+\item Sauf One-Time Pad mais peu pratique
+\end{itemize}
+\item Actuellement, chiffrement par \textbf{blocs}
+\begin{itemize}
+\item Plusieurs \textbf{modes} (ECB, CBC, CTR, etc)
+\item Bonnes confusion et diffusion (sauf pour ECB)
+\item \textbf{DES}: rapide mais clé trop faible aujourd'hui
+\item Successeur: \textbf{AES}
+\end{itemize}
+\end{itemize}
+
+\end{frame}
+\end{document}

@@ -1,0 +1,6 @@
+exo1: en clair dans le code : TropSimple
+exo2: JNZ -> NOP : juste avant le bloc « Bienvenue dans mon logiciel 2.0 »
+exo3: lancer le programme, saisir un serial, breakpoint, exécution pas à pas pour faire apparaître le bloc en clair contenant le code : DurDur
+exo4: Reversing.pdf JE -> JMP : devant le bloc « Debugger détecte » puis idem exo3 : CestFini
+exo5: idem exo4 : partiellement clair ravo! -> Bravo!
+exo6: ???

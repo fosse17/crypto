@@ -1,0 +1,74 @@
+\documentclass[a4paper]{article}
+
+
+\usepackage[latin1]{inputenc} % LaTeX, comprends les accents !
+\usepackage[T1]{fontenc} % Police contenant les caractères français
+\usepackage{geometry} % Définir les marges
+\usepackage[french,english]{babel}
+\usepackage{graphicx}
+\usepackage{url}
+
+%\pagestyle{fancyheaders}
+\title{\textbf{Sécurité logicielle: Protection logicielle et Reverse Engineering}}
+\author{Cours de sécurité: DUT S4}
+\date{2013-2014}
+\begin{document}
+\maketitle
+
+\section{Protection logicielle}
+Téléchargez l'archive à l'adresse \url{http://www.labri.fr/perso/ramet/secu/tp3.zip}. 
+
+\subsection{Exercice 1}
+Un programmeur a décidé de protéger son application à l'aide d'une validation de type license. N'ayant pas suivi de cours de sécurité, il a décide de protéger son application lui-même. Son application est située dans le répertoire  \texttt{exo1}.
+\begin{enumerate}
+\item A l'aide de l'outil OllyDbg, retrouvez le numéro de license en consultant simplement le code assembleur de l'application
+\item Que peut-on dire de ce type de vérification ?
+\end{enumerate}
+
+\subsection{Exercice 2}
+Notre programmeur ne se décourage pas. Il a compris que laisser la clé de license en clair dans le code réduit la sécurité de son application. Il a donc décider de la protéger d'une autre manière. Son application est située dans le répertoire  \texttt{exo2}.
+\begin{enumerate}
+\item Modifiez l'application pour que son programme ne vérifie plus la clé de license
+\begin{itemize}
+\item L'instruction \texttt{nop}, qui n'effectue aucune opération, pourra vous aider
+\end{itemize}
+\item Comment feriez-vous pour retrouver la clé ?
+\item Que penser de cette protection ? Comment l'améliorer ?
+\end{enumerate}
+
+\subsection{Exercice 3}
+Ne voulant pas admettre ses tords, notre programmeur met à jour son application avec une protection plus subtile. Son application est située dans le répertoire  \texttt{exo3}.
+\begin{enumerate}
+\item Récupérez la clé de license
+\begin{itemize}
+\item Note: il va falloir débugger cette fois-ci
+\end{itemize}
+\item Quel principe de sécurité a-t-il mis en place ?
+\item Que penser de cette protection ?
+\end{enumerate}
+
+\subsection{Exercice 4}
+Notre programmeur a lu sur internet quelques conseils pour empêcher le piratage de son application. Ne s'avouant pas vaincu, il met en place une nouvelle protection. Son application est située dans le répertoire  \texttt{exo4}.
+\begin{enumerate}
+\item Cassez la protection
+\item Comment aurait-il fallu intégrer à l'application l'astuce du programmeur pour qu'elle soit plus efficace ?
+\end{enumerate}
+
+
+\subsection{Exercice 5}
+Encore un nouvel essai de notre vaillant programmeur: il a construit un \textit{packer} "maison" multi-layers polymorphique (cf. le cours). Ce packeur ajoute une routine de chiffrement qui comprend \textbf{16} layers et dont la taille est de \textbf{600} octets.
+\begin{enumerate}
+\item Cassez la protection
+\item Comment feriez-vous pour automatiser la tâche ?
+\end{enumerate}
+
+
+\subsection{Exercice 6}
+Dernier essai du programmeur chevronné. Toujours à l'aide de son \textit{packer} "maison", il génère cette fois-ci un décodeurde \textbf{410} layers pour une taille de décodeur totale de \textbf{60ko}.
+\begin{enumerate}
+\item Pourquoi la vérification de mot de passe est-elle si lente ?
+\item Cassez la protection
+\item Proposez une modification de la routine de vérification pour empêcher votre technique de fonctionner
+\end{enumerate}
+
+\end{document}

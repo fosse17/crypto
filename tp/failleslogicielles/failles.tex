@@ -1,0 +1,84 @@
+\documentclass[a4paper]{article}
+
+
+\usepackage[latin1]{inputenc} % LaTeX, comprends les accents !
+\usepackage[T1]{fontenc} % Police contenant les caractères français
+\usepackage{geometry} % Définir les marges
+\usepackage[french,english]{babel}
+\usepackage{graphicx}
+\usepackage{url}
+
+%\pagestyle{fancyheaders}
+\title{\textbf{Sécurité logicielle: Protection logicielle, failles logicielles}}
+\author{Cours de sécurité: DUT S4}
+\date{2013-2014}
+\begin{document}
+\maketitle
+
+Télécharger l'archive du tp à l'adresse \url{http://www.labri.fr/perso/ramet/secu/tp4.zip}
+\section{Protection logicielle}
+\subsection{Exercice 1}
+Un programmeur a décidé de protéger son application à l'aide d'une validation de type license. N'ayant pas suivi de cours de sécurité, il a décide de protéger son application lui-même. Son application est disponible dans le repertoire \texttt{exe1}.
+\begin{enumerate}
+\item A l'aide de l'outil OllyDbg, retrouvez le numéro de license en consultant simplement le code assembleur de l'application
+\item Que peut-on dire de ce type de vérification ?
+\end{enumerate}
+
+\subsection{Exercice 2}
+Notre programmeur ne se décourage pas. Il a compris que laisser la clé de license en clair dans le code réduit la sécurité de son application. Il a donc décider de la protéger d'une autre manière. Son application est disponible dans le répertoire \texttt{exe2}.
+\begin{enumerate}
+\item Modifiez l'application pour que son programme ne vérifie plus la clé de license
+\begin{itemize}
+\item L'instruction \texttt{nop}, qui n'effectue aucune opération, pourra vous aider
+\end{itemize}
+\item Comment feriez-vous pour retrouver la clé ?
+\item Que penser de cette protection ? Comment l'améliorer ?
+\end{enumerate}
+
+\subsection{Exercice 3}
+Ne voulant pas admettre ses tords, notre programmeur met à jour son application avec une protection plus subtile. Son application est disponible dans le repertoire \texttt{exe3}.
+\begin{enumerate}
+\item Récupérez la clé de license
+\begin{itemize}
+\item Note: il va falloir débugger cette fois-ci
+\end{itemize}
+\item Quel principe de sécurité a-t-il mis en place ?
+\item Que penser de cette protection ?
+\end{enumerate}
+
+\subsection{Exercice 4}
+Notre programmeur a lu sur internet quelques conseils pour empêcher le piratage de son application. Ne s'avouant pas vaincu, il met en place une dernière protection. Son application est disponible dans le repertoire \texttt{exe4}.
+\begin{enumerate}
+\item Cassez la protection
+\item Comment aurait-il fallu intégrer à l'application l'astuce du programmeur pour qu'elle soit plus efficace ?
+\end{enumerate}
+
+\subsection{Conclusion}
+Le piratage d'applications est souvent dû à des programmeurs pensant qu'ils sont capables de protéger eux-mêmes leurs logiciels. C'est un erreur qui profite aux pirates et qui nuit aux entreprises. Utiliser des protections éprouvées et sûres est nécessaire pour garantir le respect de la propriété intellectuelle.
+
+\section{Failles logicielles: buffers overflow}
+\subsection{Exercice 5}
+Notre programmeur, loin d'abandonner, a décidé de protéger son nouveau programme en le mettant ... en ligne. 
+Le nouveau programme que vous allez devoir attaquer est en fait un service réseau qui tourne sur une machine sur le port 5678 (adresse IP au tableau). Ce programme nécessite un mot de passe avant de pouvoir être utilisé. Connaissant le programmeur à l'origine de l'application, vous suspectez que le programme est vulnérable à une attaque de type \texttt{stack overflow}.
+\begin{enumerate}
+\item Exploitez le programme pour pouvoir l'utiliser même sans connaître le mot de passe
+\begin{enumerate}
+\item Quelle est la taille du buffer d'entrée pour la demande de mot de passe ?
+\item Construisez une chaîne qui fera apparaître un stack overflow (on pourra la construire dans un fichier à l'aide de l'éditeur hexadecimal \texttt{hiew} fourni dans \texttt{tp3/bof1} avant de l'envoyer au programme)
+\item Modifiez la chaîne pour que la fonction \texttt{autoriser\_acces} soit exécutée
+\end{enumerate}
+\item Quelles protections permettraient d'éviter cette faille logicielle ?
+\end{enumerate}
+
+\subsection{Exercice 6}
+L'erreur du programmeur peut avoir des conséquences bien plus lourdes qu'un accès non autorisé à l'application. Une faille de type \texttt{remote shell} est en effet possible. 
+\begin{enumerate}
+\item Exploitez le programme présent sur le port 5679
+\begin{itemize}
+\item Le buffer est de 170 octets cette fois-ci. Pourquoi un buffer plus grand est-il nécessaire ici ?
+\item Aidez-vous du fichier shellcode.txt présent dans le répertoire \texttt{tp3/bof2}
+\end{itemize}
+\item Quelle protection aurait pu déjouer cette attaque ?
+\item Bonus: testez avec le shellcode de votre choix via le générateur de shellcode de Metasploit
+\end{enumerate}
+\end{document}

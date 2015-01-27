@@ -1,0 +1,113 @@
+push_cst(cst:entier)
+{
+6:
+  {
+    mov_reg_cst(freereg0,cst);
+    push_reg(freereg0);
+  }
+  
+1: DEFAUT
+  {
+    write8(0x68);
+    write32(cst);
+  }
+}
+
+
+push_reg(reg:registre)
+{
+1: DEFAUT
+  {
+    write8(0x50 | reg);
+  }
+}
+
+pop_reg(reg:registre)
+{
+1: DEFAUT
+  {
+    write8(0x58|reg);
+  }
+}
+
+mov_reg_cst(reg:registre,cst:entier)
+{
+
+6:
+  {
+    mov_reg_cst(reg,rndint0);
+    add_reg_cst(reg,cst-rndint0);
+  }
+6:
+  {
+    mov_reg_cst(reg,rndint0);
+    sub_reg_cst(reg,rndint0-cst);
+  }
+1: DEFAUT
+  {
+    write8(0xB8|reg);
+    write32(cst);
+  }
+}
+
+
+add_reg_reg(regdest:registre,regsrc:registre)
+{
+1: DEFAUT
+  {
+    write16(0xC003 | regdest<<11 | regsrc<<8);
+  }
+}
+
+add_reg_cst(reg:registre,cst:entier)
+{
+16:
+  {
+    mov_reg_cst(freereg0,cst);
+    add_reg_reg(reg,freereg0);
+  }
+1: DEFAUT
+  {
+    if(reg==EAX)
+    {
+      write8(0x05);
+    }
+    else
+    {
+      write16(0xC081 | (reg << 8));
+    }
+    write32(cst);
+  }
+}
+
+
+sub_reg_reg(regdest:registre,regsrc:registre)
+{
+1: DEFAUT
+  {
+    write16(0xC02B | regdest << 11 | regsrc << 8);
+  }
+}
+
+sub_reg_cst(reg:registre,cst:entier)
+{
+16:
+  {
+    mov_reg_cst(freereg0,cst);
+    sub_reg_reg(reg,freereg0);
+  }
+1: DEFAUT
+  {
+    if(reg==EAX)
+    {
+      write8(0x2D);
+    }
+    else
+    {
+      write16(0xE881 | reg<<8);
+    }
+    write32(cst);
+  }
+}
+
+
